@@ -14,7 +14,7 @@
   - 创建 Mock AI 响应逻辑（基于关键词匹配）
   - _需求: 1.2, 1.3, 6.2, 6.4, 7.2_
 
-- [ ] 3. 实现本地存储服务
+- [x] 3. 实现本地存储服务
   - 创建 StorageService 接口和实现（基于 LocalStorage）
   - 实现 feeds、articles、notes、chatHistories 的 CRUD 操作
   - 实现数据序列化和反序列化
