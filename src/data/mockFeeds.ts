@@ -1,0 +1,67 @@
+import type { Feed } from '../types';
+
+/**
+ * Mock 订阅源数据
+ */
+export const mockFeeds: Feed[] = [
+  {
+    id: 'feed-1',
+    title: 'TechCrunch',
+    url: 'https://techcrunch.com/feed/',
+    siteUrl: 'https://techcrunch.com',
+    description: '科技新闻和创业资讯',
+    iconUrl: 'https://techcrunch.com/favicon.ico',
+    unreadCount: 5,
+    lastFetchedAt: new Date('2024-01-15T10:00:00Z'),
+    createdAt: new Date('2024-01-01T00:00:00Z'),
+    updatedAt: new Date('2024-01-15T10:00:00Z'),
+  },
+  {
+    id: 'feed-2',
+    title: 'Hacker News',
+    url: 'https://news.ycombinator.com/rss',
+    siteUrl: 'https://news.ycombinator.com',
+    description: '黑客新闻 - 技术和创业讨论',
+    iconUrl: 'https://news.ycombinator.com/favicon.ico',
+    unreadCount: 12,
+    lastFetchedAt: new Date('2024-01-15T09:30:00Z'),
+    createdAt: new Date('2024-01-01T00:00:00Z'),
+    updatedAt: new Date('2024-01-15T09:30:00Z'),
+  },
+  {
+    id: 'feed-3',
+    title: 'CSS-Tricks',
+    url: 'https://css-tricks.com/feed/',
+    siteUrl: 'https://css-tricks.com',
+    description: '前端开发技巧和教程',
+    iconUrl: 'https://css-tricks.com/favicon.ico',
+    unreadCount: 3,
+    lastFetchedAt: new Date('2024-01-15T08:00:00Z'),
+    createdAt: new Date('2024-01-02T00:00:00Z'),
+    updatedAt: new Date('2024-01-15T08:00:00Z'),
+  },
+  {
+    id: 'feed-4',
+    title: 'Dev.to',
+    url: 'https://dev.to/feed',
+    siteUrl: 'https://dev.to',
+    description: '开发者社区 - 编程文章和讨论',
+    iconUrl: 'https://dev.to/favicon.ico',
+    unreadCount: 8,
+    lastFetchedAt: new Date('2024-01-15T07:00:00Z'),
+    createdAt: new Date('2024-01-03T00:00:00Z'),
+    updatedAt: new Date('2024-01-15T07:00:00Z'),
+  },
+  {
+    id: 'feed-5',
+    title: 'Smashing Magazine',
+    url: 'https://www.smashingmagazine.com/feed/',
+    siteUrl: 'https://www.smashingmagazine.com',
+    description: 'Web 设计和开发专业杂志',
+    iconUrl: 'https://www.smashingmagazine.com/favicon.ico',
+    unreadCount: 2,
+    lastFetchedAt: new Date('2024-01-15T06:00:00Z'),
+    createdAt: new Date('2024-01-04T00:00:00Z'),
+    updatedAt: new Date('2024-01-15T06:00:00Z'),
+  },
+];

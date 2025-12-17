@@ -7,7 +7,7 @@
   - 配置 ESLint 和 Prettier
   - _需求: 所有需求的基础_
 
-- [ ] 2. 实现数据模型和 Mock 数据
+- [x] 2. 实现数据模型和 Mock 数据
   - 定义 Feed、Article、Note、ChatHistory 的 TypeScript 接口
   - 创建 Mock 订阅源数据（3-5 个示例订阅源）
   - 创建 Mock 文章数据（每个订阅源 10-20 篇文章，包含 Markdown 内容）
