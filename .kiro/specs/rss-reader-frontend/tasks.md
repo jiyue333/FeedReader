@@ -24,13 +24,13 @@
   - **属性 16: 笔记持久化往返一致性**
   - **验证需求: 6.2, 6.4**
 
-- [ ] 4. 实现状态管理
+- [x] 4. 实现状态管理
   - 使用 Zustand 创建全局状态 store
   - 实现 feeds、articles 的状态管理 actions
   - 实现 activeFeedId 的 UI 状态管理
   - _需求: 2.1, 2.2, 3.1_
 
-- [ ] 5. 实现 Mock RSS 服务层
+- [x] 5. 实现 Mock RSS 服务层
   - 创建 MockRSSService 类
   - 实现 validateFeedUrl 函数（简单的 URL 格式验证）
   - 实现 fetchFeed 函数（返回 mock 订阅源数据）
