@@ -17,6 +17,7 @@ interface ArticleContentProps {
  * - 原始 HTML
  * - 代码高亮
  * - 标题自动添加 ID（用于目录导航）
+ * - 图片懒加载（性能优化）
  * 
  * 需求: 4.3, 5.2
  */
@@ -78,6 +79,18 @@ function ArticleContent({ content }: ArticleContentProps) {
               .replace(/[^\w\u4e00-\u9fa5]+/g, '-')
               .replace(/^-+|-+$/g, '');
             return <h6 id={id} {...props}>{children}</h6>;
+          },
+          // 图片懒加载优化
+          img: ({ src, alt, ...props }) => {
+            return (
+              <img
+                src={src}
+                alt={alt}
+                loading="lazy"
+                decoding="async"
+                {...props}
+              />
+            );
           },
         }}
       >

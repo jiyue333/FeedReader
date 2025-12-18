@@ -16,6 +16,7 @@ import { ChatInput } from './ChatInput';
 import { storageService } from '../services/StorageService';
 import { mockRSSService } from '../services/MockRSSService';
 import type { ChatHistory, ChatMessage as ChatMessageType } from '../types';
+import { getErrorMessage, isRetryableError } from '../utils/errors';
 
 export interface AIChatTabProps {
   articleId: string;
@@ -114,7 +115,15 @@ export function AIChatTab({ articleId, articleContent }: AIChatTabProps) {
     } catch (error) {
       // 错误处理（需求 7.5）
       console.error('Failed to send chat message:', error);
-      setError('AI 服务暂时不可用，请稍后重试');
+      const errorMsg = getErrorMessage(error);
+      setError(errorMsg);
+      
+      // 如果是可重试的错误，保留用户消息以便重试
+      // 否则，移除用户消息
+      if (!isRetryableError(error)) {
+        setMessages(messages);
+        saveChatHistory(messages);
+      }
     } finally {
       setIsLoading(false);
     }

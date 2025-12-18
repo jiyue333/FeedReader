@@ -7,6 +7,7 @@ import { useState } from 'react';
 import { useAppStore } from '../store';
 import { mockRSSService } from '../services';
 import type { ToastType } from './Toast';
+import { ValidationError, getErrorMessage } from '../utils/errors';
 
 export interface AddFeedButtonProps {
   onShowToast: (message: string, type: ToastType) => void;
@@ -29,19 +30,12 @@ export function AddFeedButton({ onShowToast }: AddFeedButtonProps) {
 
     try {
       // 1. 验证 URL 格式
-      const isValid = await mockRSSService.validateFeedUrl(url.trim());
-      if (!isValid) {
-        onShowToast('无效的 RSS feed URL', 'error');
-        setIsLoading(false);
-        return;
-      }
+      await mockRSSService.validateFeedUrl(url.trim());
 
       // 2. 检查是否已存在（去重）
       const existingFeed = feeds.find((f) => f.url === url.trim());
       if (existingFeed) {
-        onShowToast('该订阅源已存在', 'error');
-        setIsLoading(false);
-        return;
+        throw new ValidationError('该订阅源已存在');
       }
 
       // 3. 获取订阅源信息
@@ -59,24 +53,16 @@ export function AddFeedButton({ onShowToast }: AddFeedButtonProps) {
       } catch (articleError) {
         // 即使获取文章失败，订阅源也已添加成功
         console.error('Failed to fetch articles:', articleError);
-        onShowToast(`订阅源已添加，但获取文章失败`, 'warning');
+        const errorMsg = getErrorMessage(articleError);
+        onShowToast(`订阅源已添加，但获取文章失败: ${errorMsg}`, 'warning');
       }
 
       // 清空输入框
       setUrl('');
     } catch (error) {
       console.error('Failed to add feed:', error);
-      
-      // 根据错误类型显示不同的提示
-      if (error instanceof Error) {
-        if (error.message.includes('network') || error.message.includes('fetch')) {
-          onShowToast('网络连接失败，请检查网络设置', 'error');
-        } else {
-          onShowToast('添加订阅源失败，请稍后重试', 'error');
-        }
-      } else {
-        onShowToast('添加订阅源失败，请稍后重试', 'error');
-      }
+      const errorMsg = getErrorMessage(error);
+      onShowToast(errorMsg, 'error');
     } finally {
       setIsLoading(false);
     }

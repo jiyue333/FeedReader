@@ -58,3 +58,5 @@ export type { NoteCardProps } from './NoteCard';
 
 export { TextSelectionPopup } from './TextSelectionPopup';
 export type { TextSelectionPopupProps } from './TextSelectionPopup';
+
+export { ErrorBoundary } from './ErrorBoundary';

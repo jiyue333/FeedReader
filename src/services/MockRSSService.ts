@@ -2,6 +2,7 @@ import type { Feed, Article } from '../types';
 import { mockFeeds } from '../data/mockFeeds';
 import { mockArticles } from '../data/mockArticles';
 import { generateMockAIResponse } from '../data/mockAI';
+import { ValidationError, NetworkError, AIServiceError, TimeoutError } from '../utils/errors';
 
 /**
  * Mock RSS 服务 - 模拟后端 API
@@ -22,24 +23,30 @@ export class MockRSSService {
    * 验证 Feed URL 的有效性
    * @param url Feed URL
    * @returns 是否有效
+   * @throws {ValidationError} 当 URL 格式无效时
    */
   async validateFeedUrl(url: string): Promise<boolean> {
     await this.delay(200, 400);
     
     // 简单的 URL 格式验证
     if (!url || typeof url !== 'string') {
-      return false;
+      throw new ValidationError('URL 不能为空');
     }
     
     // 检查是否以 http:// 或 https:// 开头
     if (!url.startsWith('http://') && !url.startsWith('https://')) {
-      return false;
+      throw new ValidationError('URL 必须以 http:// 或 https:// 开头');
     }
     
     // 检查是否包含域名（至少有一个点）
     const urlWithoutProtocol = url.replace(/^https?:\/\//, '');
     if (!urlWithoutProtocol.includes('.')) {
-      return false;
+      throw new ValidationError('URL 格式无效');
+    }
+    
+    // 模拟网络错误（5% 概率）
+    if (Math.random() < 0.05) {
+      throw new NetworkError('无法连接到服务器');
     }
     
     return true;
@@ -49,9 +56,15 @@ export class MockRSSService {
    * 获取订阅源信息
    * @param url Feed URL
    * @returns 订阅源对象
+   * @throws {NetworkError} 当网络请求失败时
    */
   async fetchFeed(url: string): Promise<Feed> {
     await this.delay(400, 600);
+    
+    // 模拟网络错误（3% 概率）
+    if (Math.random() < 0.03) {
+      throw new NetworkError('获取订阅源信息失败');
+    }
     
     // 查找已存在的 feed
     const existingFeed = mockFeeds.find((f) => f.url === url);
@@ -83,9 +96,15 @@ export class MockRSSService {
    * 获取订阅源的文章列表
    * @param feedUrl Feed URL
    * @returns 文章列表
+   * @throws {NetworkError} 当网络请求失败时
    */
   async fetchArticles(feedUrl: string): Promise<Article[]> {
     await this.delay(300, 700);
+    
+    // 模拟网络错误（3% 概率）
+    if (Math.random() < 0.03) {
+      throw new NetworkError('获取文章列表失败');
+    }
     
     // 查找对应的 feed
     const feed = mockFeeds.find((f) => f.url === feedUrl);
@@ -105,8 +124,22 @@ export class MockRSSService {
    * @param message 用户消息
    * @param context 文章上下文
    * @returns AI 响应
+   * @throws {AIServiceError} 当 AI 服务调用失败时
+   * @throws {TimeoutError} 当请求超时时
    */
   async sendChatMessage(message: string, context: string): Promise<string> {
+    // 模拟超时错误（2% 概率）
+    if (Math.random() < 0.02) {
+      await this.delay(3000, 3000);
+      throw new TimeoutError('AI 响应超时');
+    }
+    
+    // 模拟 AI 服务错误（3% 概率）
+    if (Math.random() < 0.03) {
+      await this.delay(600, 800);
+      throw new AIServiceError('AI 服务暂时不可用');
+    }
+    
     await this.delay(600, 800);
     
     // 使用 mock AI 响应生成器

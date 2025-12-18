@@ -1,9 +1,14 @@
 /**
  * ArticleList 组件
- * 显示文章列表，支持过滤和分页加载
+ * 显示文章列表，支持过滤和虚拟滚动
+ * 
+ * 性能优化：
+ * - 使用 @tanstack/react-virtual 实现虚拟滚动
+ * - 只渲染可见区域的文章，提升大列表性能
  */
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useRef, useMemo } from 'react';
+import { useVirtualizer } from '@tanstack/react-virtual';
 import type { Article, Feed } from '../types';
 import { ArticleCard } from './ArticleCard';
 
@@ -14,68 +19,39 @@ export interface ArticleListProps {
   isLoading?: boolean;
 }
 
-const ARTICLES_PER_PAGE = 10;
-
 export function ArticleList({ articles, feeds, activeFeedId, isLoading = false }: ArticleListProps) {
-  const [displayedCount, setDisplayedCount] = useState(ARTICLES_PER_PAGE);
-  const observerTarget = useRef<HTMLDivElement>(null);
+  const parentRef = useRef<HTMLDivElement>(null);
 
   // 过滤文章：根据选中的订阅源
-  const filteredArticles = activeFeedId
-    ? articles.filter(article => article.feedId === activeFeedId)
-    : articles;
+  const filteredArticles = useMemo(() => {
+    return activeFeedId
+      ? articles.filter(article => article.feedId === activeFeedId)
+      : articles;
+  }, [articles, activeFeedId]);
 
   // 按发布时间排序（最新的在前）
-  const sortedArticles = [...filteredArticles].sort(
-    (a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
-  );
-
-  // 当前显示的文章
-  const displayedArticles = sortedArticles.slice(0, displayedCount);
-  const hasMore = displayedCount < sortedArticles.length;
-
-  // 获取文章对应的订阅源
-  const getFeedForArticle = (article: Article): Feed | undefined => {
-    return feeds.find(feed => feed.id === article.feedId);
-  };
-
-  // 加载更多文章
-  const loadMore = useCallback(() => {
-    if (hasMore && !isLoading) {
-      setDisplayedCount(prev => prev + ARTICLES_PER_PAGE);
-    }
-  }, [hasMore, isLoading]);
-
-  // 无限滚动：使用 Intersection Observer
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && hasMore && !isLoading) {
-          loadMore();
-        }
-      },
-      { threshold: 0.1 }
+  const sortedArticles = useMemo(() => {
+    return [...filteredArticles].sort(
+      (a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
     );
+  }, [filteredArticles]);
 
-    const currentTarget = observerTarget.current;
-    if (currentTarget) {
-      observer.observe(currentTarget);
-    }
+  // 获取文章对应的订阅源（使用 useMemo 优化）
+  const getFeedForArticle = useMemo(() => {
+    const feedMap = new Map(feeds.map(feed => [feed.id, feed]));
+    return (article: Article): Feed | undefined => feedMap.get(article.feedId);
+  }, [feeds]);
 
-    return () => {
-      if (currentTarget) {
-        observer.unobserve(currentTarget);
-      }
-    };
-  }, [hasMore, isLoading, loadMore]);
-
-  // 当 activeFeedId 改变时，重置显示数量
-  useEffect(() => {
-    setDisplayedCount(ARTICLES_PER_PAGE);
-  }, [activeFeedId]);
+  // 虚拟滚动配置
+  const virtualizer = useVirtualizer({
+    count: sortedArticles.length,
+    getScrollElement: () => parentRef.current,
+    estimateSize: () => 200, // 估计每个文章卡片的高度
+    overscan: 5, // 预渲染可见区域外的项目数量
+  });
 
   // 空状态
-  if (filteredArticles.length === 0) {
+  if (sortedArticles.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-16 text-gray-500">
         <svg
@@ -99,20 +75,47 @@ export function ArticleList({ articles, feeds, activeFeedId, isLoading = false }
     );
   }
 
-  return (
-    <div className="space-y-4">
-      {/* 文章列表 */}
-      {displayedArticles.map((article) => (
-        <ArticleCard
-          key={article.id}
-          article={article}
-          feed={getFeedForArticle(article)}
-        />
-      ))}
+  const items = virtualizer.getVirtualItems();
 
-      {/* 加载更多触发器 */}
-      {hasMore && (
-        <div ref={observerTarget} className="py-4 text-center">
+  return (
+    <div ref={parentRef} className="h-full overflow-auto">
+      {/* 虚拟滚动容器 */}
+      <div
+        style={{
+          height: `${virtualizer.getTotalSize()}px`,
+          width: '100%',
+          position: 'relative',
+        }}
+      >
+        {/* 只渲染可见的文章 */}
+        {items.map((virtualItem) => {
+          const article = sortedArticles[virtualItem.index];
+          return (
+            <div
+              key={virtualItem.key}
+              data-index={virtualItem.index}
+              ref={virtualizer.measureElement}
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '100%',
+                transform: `translateY(${virtualItem.start}px)`,
+              }}
+              className="pb-4"
+            >
+              <ArticleCard
+                article={article}
+                feed={getFeedForArticle(article)}
+              />
+            </div>
+          );
+        })}
+      </div>
+
+      {/* 加载状态 */}
+      {isLoading && (
+        <div className="py-4 text-center">
           <div className="inline-flex items-center gap-2 text-gray-500">
             <svg
               className="animate-spin h-5 w-5"
@@ -134,15 +137,15 @@ export function ArticleList({ articles, feeds, activeFeedId, isLoading = false }
                 d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
               />
             </svg>
-            <span>加载更多...</span>
+            <span>加载中...</span>
           </div>
         </div>
       )}
 
-      {/* 已加载全部 */}
-      {!hasMore && displayedArticles.length > 0 && (
+      {/* 文章总数提示 */}
+      {sortedArticles.length > 0 && (
         <div className="py-4 text-center text-sm text-gray-400">
-          已显示全部 {sortedArticles.length} 篇文章
+          共 {sortedArticles.length} 篇文章
         </div>
       )}
     </div>

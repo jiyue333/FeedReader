@@ -4,6 +4,7 @@
  */
 
 import type { Feed, Article, Note, ChatHistory } from '../types';
+import { StorageError } from '../utils/errors';
 
 /**
  * 存储键常量
@@ -139,7 +140,7 @@ export class StorageService implements IStorageService {
       localStorage.setItem(STORAGE_KEYS.FEEDS, JSON.stringify(serialized));
     } catch (error) {
       console.error('Failed to save feed to storage:', error);
-      throw new Error('Failed to save feed');
+      throw new StorageError('保存订阅源失败，请检查浏览器存储空间');
     }
   }
 
@@ -149,7 +150,7 @@ export class StorageService implements IStorageService {
       const index = feeds.findIndex(f => f.id === id);
       
       if (index === -1) {
-        throw new Error(`Feed with id ${id} not found`);
+        throw new StorageError(`订阅源不存在 (ID: ${id})`);
       }
       
       feeds[index] = { ...feeds[index], ...updates, updatedAt: new Date() };
@@ -158,7 +159,10 @@ export class StorageService implements IStorageService {
       localStorage.setItem(STORAGE_KEYS.FEEDS, JSON.stringify(serialized));
     } catch (error) {
       console.error('Failed to update feed in storage:', error);
-      throw new Error('Failed to update feed');
+      if (error instanceof StorageError) {
+        throw error;
+      }
+      throw new StorageError('更新订阅源失败');
     }
   }
 
@@ -177,7 +181,7 @@ export class StorageService implements IStorageService {
       localStorage.setItem(STORAGE_KEYS.ARTICLES, JSON.stringify(serializedArticles));
     } catch (error) {
       console.error('Failed to delete feed from storage:', error);
-      throw new Error('Failed to delete feed');
+      throw new StorageError('删除订阅源失败');
     }
   }
 
@@ -216,7 +220,7 @@ export class StorageService implements IStorageService {
       localStorage.setItem(STORAGE_KEYS.ARTICLES, JSON.stringify(serialized));
     } catch (error) {
       console.error('Failed to save articles to storage:', error);
-      throw new Error('Failed to save articles');
+      throw new StorageError('保存文章失败');
     }
   }
 
@@ -226,7 +230,7 @@ export class StorageService implements IStorageService {
       const index = articles.findIndex(a => a.id === id);
       
       if (index === -1) {
-        throw new Error(`Article with id ${id} not found`);
+        throw new StorageError(`文章不存在 (ID: ${id})`);
       }
       
       articles[index] = { ...articles[index], ...updates };
@@ -235,7 +239,10 @@ export class StorageService implements IStorageService {
       localStorage.setItem(STORAGE_KEYS.ARTICLES, JSON.stringify(serialized));
     } catch (error) {
       console.error('Failed to update article in storage:', error);
-      throw new Error('Failed to update article');
+      if (error instanceof StorageError) {
+        throw error;
+      }
+      throw new StorageError('更新文章失败');
     }
   }
 
@@ -273,7 +280,7 @@ export class StorageService implements IStorageService {
       localStorage.setItem(STORAGE_KEYS.NOTES, JSON.stringify(serialized));
     } catch (error) {
       console.error('Failed to save note to storage:', error);
-      throw new Error('Failed to save note');
+      throw new StorageError('保存笔记失败');
     }
   }
 
@@ -290,7 +297,7 @@ export class StorageService implements IStorageService {
       localStorage.setItem(STORAGE_KEYS.NOTES, JSON.stringify(serialized));
     } catch (error) {
       console.error('Failed to delete note from storage:', error);
-      throw new Error('Failed to delete note');
+      throw new StorageError('删除笔记失败');
     }
   }
 
@@ -328,7 +335,7 @@ export class StorageService implements IStorageService {
       localStorage.setItem(STORAGE_KEYS.CHAT_HISTORIES, JSON.stringify(serialized));
     } catch (error) {
       console.error('Failed to save chat history to storage:', error);
-      throw new Error('Failed to save chat history');
+      throw new StorageError('保存聊天历史失败');
     }
   }
 }

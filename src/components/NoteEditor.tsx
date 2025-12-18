@@ -3,13 +3,15 @@
  * 
  * 提供笔记编辑功能，包含：
  * - 文本输入区域
- * - 实时保存（防抖）
+ * - 实时保存（防抖优化）
  * - 文本选中添加到笔记的快捷操作
  * 
  * 需求: 6.2, 6.3
+ * 性能优化: 使用防抖减少保存频率
  */
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { useDebounce } from '../hooks/useDebounce';
 
 export interface NoteEditorProps {
   articleId: string;
@@ -25,7 +27,9 @@ export function NoteEditor({ articleId, initialContent, onSave }: NoteEditorProp
   const [isSaving, setIsSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  
+  // 使用防抖 Hook 优化保存性能
+  const debouncedContent = useDebounce(content, DEBOUNCE_DELAY);
 
   // 当 articleId 变化时，重置内容
   useEffect(() => {
@@ -33,30 +37,22 @@ export function NoteEditor({ articleId, initialContent, onSave }: NoteEditorProp
     setLastSaved(null);
   }, [articleId, initialContent]);
 
-  // 防抖保存函数（需求 6.2）
-  const debouncedSave = useCallback(
-    (newContent: string) => {
-      // 清除之前的定时器
-      if (saveTimeoutRef.current) {
-        clearTimeout(saveTimeoutRef.current);
-      }
+  // 当防抖后的内容变化时，执行保存（需求 6.2）
+  useEffect(() => {
+    // 跳过初始渲染和空内容
+    if (debouncedContent === initialContent) {
+      return;
+    }
 
-      // 设置新的定时器
-      saveTimeoutRef.current = setTimeout(() => {
-        setIsSaving(true);
-        onSave(newContent);
-        setLastSaved(new Date());
-        setIsSaving(false);
-      }, DEBOUNCE_DELAY);
-    },
-    [onSave]
-  );
+    setIsSaving(true);
+    onSave(debouncedContent);
+    setLastSaved(new Date());
+    setIsSaving(false);
+  }, [debouncedContent, onSave, initialContent]);
 
   // 处理内容变化
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const newContent = e.target.value;
-    setContent(newContent);
-    debouncedSave(newContent);
+    setContent(e.target.value);
   };
 
   // 处理文本选中添加到笔记（需求 6.3）
@@ -142,7 +138,6 @@ export function NoteEditor({ articleId, initialContent, onSave }: NoteEditorProp
       : `> ${text}`;
     
     setContent(newContent);
-    debouncedSave(newContent);
 
     // 聚焦到文本框末尾
     if (textareaRef.current) {
@@ -150,15 +145,6 @@ export function NoteEditor({ articleId, initialContent, onSave }: NoteEditorProp
       textareaRef.current.setSelectionRange(newContent.length, newContent.length);
     }
   };
-
-  // 清理定时器
-  useEffect(() => {
-    return () => {
-      if (saveTimeoutRef.current) {
-        clearTimeout(saveTimeoutRef.current);
-      }
-    };
-  }, []);
 
   return (
     <div className="flex flex-col h-full p-6">

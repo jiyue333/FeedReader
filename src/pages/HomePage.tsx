@@ -42,8 +42,8 @@ function HomePage() {
       />
 
       {/* 主内容区 */}
-      <div className="flex-1 overflow-y-auto bg-gray-50">
-        <div className="max-w-4xl mx-auto p-6">
+      <div className="flex-1 flex flex-col bg-gray-50">
+        <div className="max-w-4xl mx-auto w-full p-6">
           {/* 页面标题 */}
           <div className="mb-6">
             <h1 className="text-3xl font-bold text-gray-900 mb-2">
@@ -53,8 +53,10 @@ function HomePage() {
               <p className="text-gray-600">{activeFeed.description}</p>
             )}
           </div>
+        </div>
 
-          {/* 文章列表 */}
+        {/* 文章列表 - 占据剩余空间 */}
+        <div className="flex-1 max-w-4xl mx-auto w-full px-6 pb-6">
           <ArticleList
             articles={articles}
             feeds={feeds}

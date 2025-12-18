@@ -68,12 +68,23 @@ export const markdownWithHeadingsArbitrary = fc
   );
 
 /**
+ * Generator for NoteItem objects
+ */
+export const noteItemArbitrary = fc.record({
+  id: fc.uuid(),
+  content: fc.string({ minLength: 1, maxLength: 1000 }),
+  quotedText: fc.option(fc.string({ maxLength: 500 }), { nil: undefined }),
+  createdAt: fc.date(),
+  updatedAt: fc.date(),
+});
+
+/**
  * Generator for Note objects
  */
 export const noteArbitrary: fc.Arbitrary<Note> = fc.record({
   id: fc.uuid(),
   articleId: fc.uuid(),
-  content: fc.string({ maxLength: 5000 }),
+  items: fc.array(noteItemArbitrary, { minLength: 0, maxLength: 10 }),
   createdAt: fc.date(),
   updatedAt: fc.date(),
 });

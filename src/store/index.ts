@@ -57,10 +57,21 @@ export const useAppStore = create<AppState>((set, get) => ({
     }));
     
     // 持久化到 LocalStorage
-    storageService.saveFeed(feed);
+    try {
+      storageService.saveFeed(feed);
+    } catch (error) {
+      console.error('Failed to save feed:', error);
+      // 回滚状态
+      set((state) => ({
+        feeds: state.feeds.filter(f => f.id !== feed.id),
+      }));
+      throw error;
+    }
   },
   
   updateFeed: (id: string, updates: Partial<Feed>) => {
+    const oldFeeds = get().feeds;
+    
     set((state) => ({
       feeds: state.feeds.map((feed) =>
         feed.id === id ? { ...feed, ...updates, updatedAt: new Date() } : feed
@@ -68,10 +79,23 @@ export const useAppStore = create<AppState>((set, get) => ({
     }));
     
     // 持久化到 LocalStorage
-    storageService.updateFeed(id, updates);
+    try {
+      storageService.updateFeed(id, updates);
+    } catch (error) {
+      console.error('Failed to update feed:', error);
+      // 回滚状态
+      set({ feeds: oldFeeds });
+      throw error;
+    }
   },
   
   removeFeed: (id: string) => {
+    const oldState = {
+      feeds: get().feeds,
+      articles: get().articles,
+      activeFeedId: get().activeFeedId,
+    };
+    
     set((state) => ({
       feeds: state.feeds.filter((feed) => feed.id !== id),
       articles: state.articles.filter((article) => article.feedId !== id),
@@ -79,7 +103,14 @@ export const useAppStore = create<AppState>((set, get) => ({
     }));
     
     // 从 LocalStorage 删除
-    storageService.deleteFeed(id);
+    try {
+      storageService.deleteFeed(id);
+    } catch (error) {
+      console.error('Failed to delete feed:', error);
+      // 回滚状态
+      set(oldState);
+      throw error;
+    }
   },
   
   setFeeds: (feeds: Feed[]) => {
@@ -88,6 +119,8 @@ export const useAppStore = create<AppState>((set, get) => ({
   
   // Article Actions
   addArticles: (articles: Article[]) => {
+    const oldArticles = get().articles;
+    
     set((state) => {
       // 使用 Map 去重，保留新文章
       const articleMap = new Map(state.articles.map((a) => [a.id, a]));
@@ -102,13 +135,22 @@ export const useAppStore = create<AppState>((set, get) => ({
     });
     
     // 持久化到 LocalStorage
-    storageService.saveArticles(articles);
-    
-    // 更新未读计数
-    get().updateUnreadCounts();
+    try {
+      storageService.saveArticles(articles);
+      
+      // 更新未读计数
+      get().updateUnreadCounts();
+    } catch (error) {
+      console.error('Failed to save articles:', error);
+      // 回滚状态
+      set({ articles: oldArticles });
+      throw error;
+    }
   },
   
   markAsRead: (articleId: string) => {
+    const oldArticles = get().articles;
+    
     set((state) => ({
       articles: state.articles.map((article) =>
         article.id === articleId ? { ...article, isRead: true } : article
@@ -116,10 +158,17 @@ export const useAppStore = create<AppState>((set, get) => ({
     }));
     
     // 持久化到 LocalStorage
-    storageService.updateArticle(articleId, { isRead: true });
-    
-    // 更新未读计数
-    get().updateUnreadCounts();
+    try {
+      storageService.updateArticle(articleId, { isRead: true });
+      
+      // 更新未读计数
+      get().updateUnreadCounts();
+    } catch (error) {
+      console.error('Failed to mark article as read:', error);
+      // 回滚状态
+      set({ articles: oldArticles });
+      // 不抛出错误，因为这不是关键操作
+    }
   },
   
   setArticles: (articles: Article[]) => {
@@ -179,8 +228,13 @@ export const useAppStore = create<AppState>((set, get) => ({
     set({ feeds: updatedFeeds });
     
     // 持久化更新后的 feeds
-    updatedFeeds.forEach((feed) => {
-      storageService.updateFeed(feed.id, { unreadCount: feed.unreadCount });
-    });
+    try {
+      updatedFeeds.forEach((feed) => {
+        storageService.updateFeed(feed.id, { unreadCount: feed.unreadCount });
+      });
+    } catch (error) {
+      console.error('Failed to update unread counts:', error);
+      // 不抛出错误，因为这不是关键操作
+    }
   },
 }));
