@@ -133,16 +133,35 @@ export const useAppStore = create<AppState>((set, get) => ({
   
   // 初始化方法
   initializeFromStorage: () => {
-    const feeds = storageService.getFeeds();
-    const articles = storageService.getArticles();
+    let feeds = storageService.getFeeds();
+    let articles = storageService.getArticles();
     
-    set({
-      feeds,
-      articles,
-    });
-    
-    // 初始化后更新未读计数
-    get().updateUnreadCounts();
+    // 如果 LocalStorage 为空，加载 mock 数据
+    if (feeds.length === 0) {
+      // 动态导入 mock 数据
+      import('../data').then(({ mockFeeds, mockArticles }) => {
+        // 保存 mock 数据到 LocalStorage
+        mockFeeds.forEach(feed => storageService.saveFeed(feed));
+        storageService.saveArticles(mockArticles);
+        
+        // 更新状态
+        set({
+          feeds: mockFeeds,
+          articles: mockArticles,
+        });
+        
+        // 更新未读计数
+        get().updateUnreadCounts();
+      });
+    } else {
+      set({
+        feeds,
+        articles,
+      });
+      
+      // 初始化后更新未读计数
+      get().updateUnreadCounts();
+    }
   },
   
   // 更新未读计数
