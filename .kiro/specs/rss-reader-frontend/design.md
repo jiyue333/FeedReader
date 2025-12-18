@@ -6,14 +6,17 @@
 
 ### 技术栈
 
-- **前端框架**: React 18+ with TypeScript
-- **路由**: React Router v6
+- **前端框架**: React 19+ with TypeScript
+- **路由**: React Router v7
 - **状态管理**: Zustand（轻量级状态管理）
-- **UI 组件库**: Tailwind CSS + Headless UI
-- **数据获取**: TanStack Query (React Query)
+- **UI 组件库**: Tailwind CSS v4 + Headless UI
+- **虚拟滚动**: TanStack Virtual
 - **本地存储**: LocalStorage（简化的 mock 数据存储）
 - **Markdown 渲染**: react-markdown + remark/rehype 插件
+- **HTML 净化**: rehype-sanitize（防止 XSS）
+- **代码高亮**: rehype-highlight
 - **构建工具**: Vite
+- **测试框架**: Vitest + React Testing Library + fast-check
 - **Mock 数据**: 内置 mock 数据和 mock 服务层
 
 ## 架构
@@ -207,10 +210,18 @@ interface Article {
 ### Note（笔记）
 
 ```typescript
+interface NoteItem {
+  id: string;
+  content: string;
+  quotedText?: string; // 引用的文章文字
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 interface Note {
   id: string;
   articleId: string;
-  content: string;
+  items: NoteItem[]; // 多条笔记项
   createdAt: Date;
   updatedAt: Date;
 }

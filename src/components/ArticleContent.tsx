@@ -1,8 +1,11 @@
+import { useMemo } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
+import rehypeSanitize from 'rehype-sanitize';
 import rehypeHighlight from 'rehype-highlight';
 import 'highlight.js/styles/atom-one-light.css';
+import { generateUniqueSlug } from '../utils/slugify';
 
 interface ArticleContentProps {
   content: string;
@@ -14,14 +17,68 @@ interface ArticleContentProps {
  * 使用 react-markdown 渲染 Markdown 内容
  * 支持：
  * - GFM (GitHub Flavored Markdown) - 表格、删除线、任务列表等
- * - 原始 HTML
+ * - 原始 HTML（经过净化处理，防止 XSS）
  * - 代码高亮
- * - 标题自动添加 ID（用于目录导航）
+ * - 标题自动添加唯一 ID（用于目录导航）
  * - 图片懒加载（性能优化）
  *
+ * 安全性：使用 rehype-sanitize 净化 HTML，防止 XSS 攻击
  * 需求: 4.3, 5.2
  */
 function ArticleContent({ content }: ArticleContentProps) {
+  // 预先收集所有标题并生成唯一 ID（按出现顺序）
+  const headingSlugs = useMemo(() => {
+    const slugsByText = new Map<string, string[]>(); // text -> [slug1, slug2, ...]
+    const existingSlugs = new Set<string>();
+
+    // 提取所有标题文本
+    const headingRegex = /^(#{1,6})\s+(.+)$/gm;
+    let match;
+
+    while ((match = headingRegex.exec(content)) !== null) {
+      const text = match[2].trim();
+      const slug = generateUniqueSlug(text, existingSlugs);
+      existingSlugs.add(slug);
+
+      // 按出现顺序存储 slug
+      if (!slugsByText.has(text)) {
+        slugsByText.set(text, []);
+      }
+      slugsByText.get(text)!.push(slug);
+    }
+
+    return slugsByText;
+  }, [content]);
+
+  // 创建标题组件工厂函数（使用闭包跟踪每个文本的使用次数）
+  const createHeadingComponent = (Tag: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6') => {
+    const textCounters = new Map<string, number>(); // 跟踪每个文本已使用的次数
+
+    return ({ children, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => {
+      const text = String(children);
+      const slugs = headingSlugs.get(text);
+
+      let id: string;
+      if (slugs && slugs.length > 0) {
+        // 获取当前文本的使用次数
+        const currentCount = textCounters.get(text) || 0;
+        // 使用对应顺序的 slug
+        id = slugs[currentCount] || slugs[slugs.length - 1];
+        // 更新计数器
+        textCounters.set(text, currentCount + 1);
+      } else {
+        // 降级处理：如果没有预先生成的 slug
+        id = generateUniqueSlug(text, new Set());
+      }
+
+      return (
+        <Tag id={id} {...props}>
+          {children}
+        </Tag>
+      );
+    };
+  };
+
   return (
     <div
       data-article-content
@@ -29,81 +86,19 @@ function ArticleContent({ content }: ArticleContentProps) {
     >
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
-        rehypePlugins={[rehypeRaw, rehypeHighlight]}
+        rehypePlugins={[
+          rehypeRaw,
+          rehypeSanitize, // 净化 HTML，防止 XSS
+          rehypeHighlight,
+        ]}
         components={{
-          // 为标题添加 ID，用于目录导航
-          h1: ({ children, ...props }) => {
-            const text = String(children);
-            const id = text
-              .toLowerCase()
-              .replace(/[^\w\u4e00-\u9fa5]+/g, '-')
-              .replace(/^-+|-+$/g, '');
-            return (
-              <h1 id={id} {...props}>
-                {children}
-              </h1>
-            );
-          },
-          h2: ({ children, ...props }) => {
-            const text = String(children);
-            const id = text
-              .toLowerCase()
-              .replace(/[^\w\u4e00-\u9fa5]+/g, '-')
-              .replace(/^-+|-+$/g, '');
-            return (
-              <h2 id={id} {...props}>
-                {children}
-              </h2>
-            );
-          },
-          h3: ({ children, ...props }) => {
-            const text = String(children);
-            const id = text
-              .toLowerCase()
-              .replace(/[^\w\u4e00-\u9fa5]+/g, '-')
-              .replace(/^-+|-+$/g, '');
-            return (
-              <h3 id={id} {...props}>
-                {children}
-              </h3>
-            );
-          },
-          h4: ({ children, ...props }) => {
-            const text = String(children);
-            const id = text
-              .toLowerCase()
-              .replace(/[^\w\u4e00-\u9fa5]+/g, '-')
-              .replace(/^-+|-+$/g, '');
-            return (
-              <h4 id={id} {...props}>
-                {children}
-              </h4>
-            );
-          },
-          h5: ({ children, ...props }) => {
-            const text = String(children);
-            const id = text
-              .toLowerCase()
-              .replace(/[^\w\u4e00-\u9fa5]+/g, '-')
-              .replace(/^-+|-+$/g, '');
-            return (
-              <h5 id={id} {...props}>
-                {children}
-              </h5>
-            );
-          },
-          h6: ({ children, ...props }) => {
-            const text = String(children);
-            const id = text
-              .toLowerCase()
-              .replace(/[^\w\u4e00-\u9fa5]+/g, '-')
-              .replace(/^-+|-+$/g, '');
-            return (
-              <h6 id={id} {...props}>
-                {children}
-              </h6>
-            );
-          },
+          // 为标题添加唯一 ID，用于目录导航
+          h1: createHeadingComponent('h1'),
+          h2: createHeadingComponent('h2'),
+          h3: createHeadingComponent('h3'),
+          h4: createHeadingComponent('h4'),
+          h5: createHeadingComponent('h5'),
+          h6: createHeadingComponent('h6'),
           // 图片懒加载优化
           img: ({ src, alt, ...props }) => {
             return (

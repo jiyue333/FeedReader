@@ -1,24 +1,14 @@
 import { useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useAppStore } from '../store';
 import { Sidebar, Toast, ArticleList } from '../components';
 import { useToast } from '../hooks/useToast';
 
 function HomePage() {
   const { feedId } = useParams<{ feedId: string }>();
-  const {
-    feeds,
-    articles,
-    activeFeedId,
-    setActiveFeedId,
-    initializeFromStorage,
-  } = useAppStore();
+  const navigate = useNavigate();
+  const { feeds, articles, activeFeedId, setActiveFeedId } = useAppStore();
   const { toast, showToast, hideToast } = useToast();
-
-  // 初始化：从 LocalStorage 加载数据
-  useEffect(() => {
-    initializeFromStorage();
-  }, [initializeFromStorage]);
 
   // 同步 URL 参数和状态
   useEffect(() => {
@@ -29,9 +19,9 @@ function HomePage() {
     }
   }, [feedId, setActiveFeedId]);
 
-  // 处理订阅源选择
+  // 处理订阅源选择 - 同步更新 URL
   const handleFeedSelect = (feedId: string) => {
-    setActiveFeedId(feedId);
+    navigate(`/feed/${feedId}`);
   };
 
   // 获取当前选中的订阅源

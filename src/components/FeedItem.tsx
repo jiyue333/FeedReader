@@ -14,17 +14,29 @@ export interface FeedItemProps {
 export function FeedItem({ feed, isActive, onClick }: FeedItemProps) {
   const hasUnread = feed.unreadCount > 0;
 
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      onClick(feed.id);
+    }
+  };
+
   return (
-    <div
+    <button
+      type="button"
       onClick={() => onClick(feed.id)}
+      onKeyDown={handleKeyDown}
+      aria-label={`${feed.title}${hasUnread ? `, ${feed.unreadCount} 条未读` : ''}`}
+      aria-current={isActive ? 'page' : undefined}
       className={`
-        p-3 rounded-md cursor-pointer transition-all
+        w-full text-left p-3 rounded-md cursor-pointer transition-all
         ${
           isActive
             ? 'bg-blue-50 border-2 border-blue-500 shadow-md'
             : 'bg-white border-2 border-transparent hover:shadow-md'
         }
         ${hasUnread ? 'font-semibold' : ''}
+        focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
       `}
     >
       <div className="flex items-start justify-between gap-2">
@@ -66,6 +78,6 @@ export function FeedItem({ feed, isActive, onClick }: FeedItemProps) {
           </div>
         )}
       </div>
-    </div>
+    </button>
   );
 }
