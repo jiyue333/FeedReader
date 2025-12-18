@@ -91,6 +91,15 @@ function deserializeDates<T>(obj: any, dateFields: string[]): T {
       }));
     }
     
+    // 递归处理 Note 中的 items
+    if (deserialized.items && Array.isArray(deserialized.items)) {
+      deserialized.items = deserialized.items.map((item: any) => ({
+        ...item,
+        createdAt: item.createdAt ? new Date(item.createdAt) : item.createdAt,
+        updatedAt: item.updatedAt ? new Date(item.updatedAt) : item.updatedAt,
+      }));
+    }
+    
     return deserialized;
   }
   

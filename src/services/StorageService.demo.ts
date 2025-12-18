@@ -102,7 +102,15 @@ export function demoNoteOperations() {
   const testNote: Note = {
     id: 'note-1',
     articleId: 'article-1',
-    content: 'This is my note about the article',
+    items: [
+      {
+        id: 'note-item-1',
+        content: 'This is my note about the article',
+        quotedText: 'Some quoted text from the article',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+    ],
     createdAt: new Date(),
     updatedAt: new Date(),
   };
@@ -118,7 +126,15 @@ export function demoNoteOperations() {
   // 更新 Note (通过保存相同 articleId 的新 Note)
   const updatedNote: Note = {
     ...testNote,
-    content: 'Updated note content',
+    items: [
+      ...testNote.items,
+      {
+        id: 'note-item-2',
+        content: 'Another note item',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+    ],
     updatedAt: new Date(),
   };
   storageService.saveNote(updatedNote);

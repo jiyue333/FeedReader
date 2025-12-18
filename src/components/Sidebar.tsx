@@ -6,6 +6,7 @@
 import type { Feed } from '../types';
 import type { ToastType } from './Toast';
 import { AddFeedButton } from './AddFeedButton';
+import { RefreshButton } from './RefreshButton';
 import { FeedList } from './FeedList';
 
 export interface SidebarProps {
@@ -24,6 +25,9 @@ export function Sidebar({ feeds, activeFeedId, onFeedSelect, onShowToast }: Side
         
         {/* 添加订阅源按钮 */}
         <AddFeedButton onShowToast={onShowToast} />
+        
+        {/* 刷新按钮 */}
+        <RefreshButton onShowToast={onShowToast} />
       </div>
 
       {/* 订阅源列表 */}

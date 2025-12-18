@@ -35,12 +35,23 @@ export interface Article {
 }
 
 /**
- * 笔记
+ * 单条笔记项
+ */
+export interface NoteItem {
+  id: string;
+  content: string;
+  quotedText?: string; // 引用的文章文字
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+/**
+ * 笔记集合（一篇文章的所有笔记）
  */
 export interface Note {
   id: string;
   articleId: string;
-  content: string;
+  items: NoteItem[]; // 多条笔记
   createdAt: Date;
   updatedAt: Date;
 }
