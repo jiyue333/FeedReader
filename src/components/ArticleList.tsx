@@ -1,7 +1,7 @@
 /**
  * ArticleList 组件
  * 显示文章列表，支持过滤和虚拟滚动
- * 
+ *
  * 性能优化：
  * - 使用 @tanstack/react-virtual 实现虚拟滚动
  * - 只渲染可见区域的文章，提升大列表性能
@@ -19,26 +19,32 @@ export interface ArticleListProps {
   isLoading?: boolean;
 }
 
-export function ArticleList({ articles, feeds, activeFeedId, isLoading = false }: ArticleListProps) {
+export function ArticleList({
+  articles,
+  feeds,
+  activeFeedId,
+  isLoading = false,
+}: ArticleListProps) {
   const parentRef = useRef<HTMLDivElement>(null);
 
   // 过滤文章：根据选中的订阅源
   const filteredArticles = useMemo(() => {
     return activeFeedId
-      ? articles.filter(article => article.feedId === activeFeedId)
+      ? articles.filter((article) => article.feedId === activeFeedId)
       : articles;
   }, [articles, activeFeedId]);
 
   // 按发布时间排序（最新的在前）
   const sortedArticles = useMemo(() => {
     return [...filteredArticles].sort(
-      (a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
+      (a, b) =>
+        new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
     );
   }, [filteredArticles]);
 
   // 获取文章对应的订阅源（使用 useMemo 优化）
   const getFeedForArticle = useMemo(() => {
-    const feedMap = new Map(feeds.map(feed => [feed.id, feed]));
+    const feedMap = new Map(feeds.map((feed) => [feed.id, feed]));
     return (article: Article): Feed | undefined => feedMap.get(article.feedId);
   }, [feeds]);
 

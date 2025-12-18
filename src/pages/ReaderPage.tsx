@@ -5,12 +5,12 @@ import { ArticleContent, TableOfContents, FunctionPanel } from '../components';
 
 /**
  * 阅读页面组件
- * 
+ *
  * 实现三栏布局：
  * - 左侧：目录栏（Table of Contents）
  * - 中间：文章内容区（Article Content）
  * - 右侧：功能栏（Function Panel - 笔记和AI聊天）
- * 
+ *
  * 需求: 4.1, 4.2, 4.3, 4.4
  */
 function ReaderPage() {
@@ -76,15 +76,31 @@ function ReaderPage() {
             <div className="flex items-center text-sm text-gray-600 space-x-4">
               {article.author && (
                 <span className="flex items-center">
-                  <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                  <svg
+                    className="w-4 h-4 mr-1"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
+                      clipRule="evenodd"
+                    />
                   </svg>
                   {article.author}
                 </span>
               )}
               <span className="flex items-center">
-                <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clipRule="evenodd" />
+                <svg
+                  className="w-4 h-4 mr-1"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
+                    clipRule="evenodd"
+                  />
                 </svg>
                 {new Date(article.publishedAt).toLocaleDateString('zh-CN', {
                   year: 'numeric',
@@ -99,7 +115,11 @@ function ReaderPage() {
                   rel="noopener noreferrer"
                   className="flex items-center text-blue-600 hover:text-blue-800"
                 >
-                  <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                  <svg
+                    className="w-4 h-4 mr-1"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
                     <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z" />
                     <path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z" />
                   </svg>
@@ -116,7 +136,10 @@ function ReaderPage() {
 
       {/* 右侧：功能栏 (Function Panel) */}
       <aside className="w-96 flex-shrink-0 border-l border-gray-200 bg-white overflow-y-auto">
-        <FunctionPanel articleId={article.id} articleContent={article.content} />
+        <FunctionPanel
+          articleId={article.id}
+          articleContent={article.content}
+        />
       </aside>
     </div>
   );

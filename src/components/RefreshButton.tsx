@@ -37,7 +37,7 @@ export function RefreshButton({ onShowToast }: RefreshButtonProps) {
       let failureCount = 0;
 
       const failedFeeds: string[] = [];
-      
+
       results.forEach((result, index) => {
         if (result.status === 'fulfilled') {
           successCount++;
@@ -45,7 +45,10 @@ export function RefreshButton({ onShowToast }: RefreshButtonProps) {
         } else {
           failureCount++;
           failedFeeds.push(feeds[index].title);
-          console.error(`Failed to fetch articles for feed ${feeds[index].title}:`, result.reason);
+          console.error(
+            `Failed to fetch articles for feed ${feeds[index].title}:`,
+            result.reason
+          );
         }
       });
 
@@ -56,13 +59,20 @@ export function RefreshButton({ onShowToast }: RefreshButtonProps) {
 
       // 显示刷新结果
       if (failureCount === 0) {
-        onShowToast(`刷新成功，获取了 ${allNewArticles.length} 篇文章`, 'success');
+        onShowToast(
+          `刷新成功，获取了 ${allNewArticles.length} 篇文章`,
+          'success'
+        );
       } else if (successCount === 0) {
         onShowToast('所有订阅源刷新失败，请检查网络连接', 'error');
       } else {
         const failedList = failedFeeds.slice(0, 2).join(', ');
-        const moreText = failedFeeds.length > 2 ? ` 等${failedFeeds.length}个` : '';
-        onShowToast(`部分刷新成功，${failedList}${moreText}刷新失败`, 'warning');
+        const moreText =
+          failedFeeds.length > 2 ? ` 等${failedFeeds.length}个` : '';
+        onShowToast(
+          `部分刷新成功，${failedList}${moreText}刷新失败`,
+          'warning'
+        );
       }
     } catch (error) {
       console.error('Refresh failed:', error);

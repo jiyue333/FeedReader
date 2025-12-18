@@ -1,10 +1,10 @@
 /**
  * 功能面板组件
- * 
+ *
  * 提供 Tab 切换功能，包含：
  * - 笔记 Tab
  * - AI 聊天 Tab
- * 
+ *
  * 需求: 6.1, 7.1
  */
 
@@ -19,7 +19,10 @@ export interface FunctionPanelProps {
 
 type TabType = 'notes' | 'chat';
 
-export function FunctionPanel({ articleId, articleContent }: FunctionPanelProps) {
+export function FunctionPanel({
+  articleId,
+  articleContent,
+}: FunctionPanelProps) {
   const [activeTab, setActiveTab] = useState<TabType>('notes');
 
   return (

@@ -46,15 +46,15 @@ export interface IStorageService {
  */
 function serializeDates<T>(obj: T): any {
   if (obj === null || obj === undefined) return obj;
-  
+
   if (obj instanceof Date) {
     return obj.toISOString();
   }
-  
+
   if (Array.isArray(obj)) {
     return obj.map(serializeDates);
   }
-  
+
   if (typeof obj === 'object') {
     const serialized: any = {};
     for (const [key, value] of Object.entries(obj)) {
@@ -62,7 +62,7 @@ function serializeDates<T>(obj: T): any {
     }
     return serialized;
   }
-  
+
   return obj;
 }
 
@@ -71,11 +71,11 @@ function serializeDates<T>(obj: T): any {
  */
 function deserializeDates<T>(obj: any, dateFields: string[]): T {
   if (obj === null || obj === undefined) return obj;
-  
+
   if (Array.isArray(obj)) {
-    return obj.map(item => deserializeDates(item, dateFields)) as any;
+    return obj.map((item) => deserializeDates(item, dateFields)) as any;
   }
-  
+
   if (typeof obj === 'object') {
     const deserialized: any = { ...obj };
     for (const field of dateFields) {
@@ -83,7 +83,7 @@ function deserializeDates<T>(obj: any, dateFields: string[]): T {
         deserialized[field] = new Date(deserialized[field]);
       }
     }
-    
+
     // 递归处理嵌套对象（如 ChatHistory 中的 messages）
     if (deserialized.messages && Array.isArray(deserialized.messages)) {
       deserialized.messages = deserialized.messages.map((msg: any) => ({
@@ -91,7 +91,7 @@ function deserializeDates<T>(obj: any, dateFields: string[]): T {
         timestamp: msg.timestamp ? new Date(msg.timestamp) : msg.timestamp,
       }));
     }
-    
+
     // 递归处理 Note 中的 items
     if (deserialized.items && Array.isArray(deserialized.items)) {
       deserialized.items = deserialized.items.map((item: any) => ({
@@ -100,10 +100,10 @@ function deserializeDates<T>(obj: any, dateFields: string[]): T {
         updatedAt: item.updatedAt ? new Date(item.updatedAt) : item.updatedAt,
       }));
     }
-    
+
     return deserialized;
   }
-  
+
   return obj;
 }
 
@@ -116,9 +116,13 @@ export class StorageService implements IStorageService {
     try {
       const data = localStorage.getItem(STORAGE_KEYS.FEEDS);
       if (!data) return [];
-      
+
       const feeds = JSON.parse(data);
-      return deserializeDates<Feed[]>(feeds, ['lastFetchedAt', 'createdAt', 'updatedAt']);
+      return deserializeDates<Feed[]>(feeds, [
+        'lastFetchedAt',
+        'createdAt',
+        'updatedAt',
+      ]);
     } catch (error) {
       console.error('Failed to get feeds from storage:', error);
       return [];
@@ -128,14 +132,14 @@ export class StorageService implements IStorageService {
   saveFeed(feed: Feed): void {
     try {
       const feeds = this.getFeeds();
-      const existingIndex = feeds.findIndex(f => f.id === feed.id);
-      
+      const existingIndex = feeds.findIndex((f) => f.id === feed.id);
+
       if (existingIndex >= 0) {
         feeds[existingIndex] = feed;
       } else {
         feeds.push(feed);
       }
-      
+
       const serialized = serializeDates(feeds);
       localStorage.setItem(STORAGE_KEYS.FEEDS, JSON.stringify(serialized));
     } catch (error) {
@@ -147,14 +151,14 @@ export class StorageService implements IStorageService {
   updateFeed(id: string, updates: Partial<Feed>): void {
     try {
       const feeds = this.getFeeds();
-      const index = feeds.findIndex(f => f.id === id);
-      
+      const index = feeds.findIndex((f) => f.id === id);
+
       if (index === -1) {
         throw new StorageError(`订阅源不存在 (ID: ${id})`);
       }
-      
+
       feeds[index] = { ...feeds[index], ...updates, updatedAt: new Date() };
-      
+
       const serialized = serializeDates(feeds);
       localStorage.setItem(STORAGE_KEYS.FEEDS, JSON.stringify(serialized));
     } catch (error) {
@@ -169,16 +173,19 @@ export class StorageService implements IStorageService {
   deleteFeed(id: string): void {
     try {
       const feeds = this.getFeeds();
-      const filtered = feeds.filter(f => f.id !== id);
-      
+      const filtered = feeds.filter((f) => f.id !== id);
+
       const serialized = serializeDates(filtered);
       localStorage.setItem(STORAGE_KEYS.FEEDS, JSON.stringify(serialized));
-      
+
       // Also delete related articles
       const articles = this.getArticles();
-      const filteredArticles = articles.filter(a => a.feedId !== id);
+      const filteredArticles = articles.filter((a) => a.feedId !== id);
       const serializedArticles = serializeDates(filteredArticles);
-      localStorage.setItem(STORAGE_KEYS.ARTICLES, JSON.stringify(serializedArticles));
+      localStorage.setItem(
+        STORAGE_KEYS.ARTICLES,
+        JSON.stringify(serializedArticles)
+      );
     } catch (error) {
       console.error('Failed to delete feed from storage:', error);
       throw new StorageError('删除订阅源失败');
@@ -190,14 +197,17 @@ export class StorageService implements IStorageService {
     try {
       const data = localStorage.getItem(STORAGE_KEYS.ARTICLES);
       if (!data) return [];
-      
+
       const articles = JSON.parse(data);
-      const deserialized = deserializeDates<Article[]>(articles, ['publishedAt', 'createdAt']);
-      
+      const deserialized = deserializeDates<Article[]>(articles, [
+        'publishedAt',
+        'createdAt',
+      ]);
+
       if (feedId) {
-        return deserialized.filter(a => a.feedId === feedId);
+        return deserialized.filter((a) => a.feedId === feedId);
       }
-      
+
       return deserialized;
     } catch (error) {
       console.error('Failed to get articles from storage:', error);
@@ -208,13 +218,13 @@ export class StorageService implements IStorageService {
   saveArticles(articles: Article[]): void {
     try {
       const existingArticles = this.getArticles();
-      const articleMap = new Map(existingArticles.map(a => [a.id, a]));
-      
+      const articleMap = new Map(existingArticles.map((a) => [a.id, a]));
+
       // Merge new articles with existing ones
       for (const article of articles) {
         articleMap.set(article.id, article);
       }
-      
+
       const merged = Array.from(articleMap.values());
       const serialized = serializeDates(merged);
       localStorage.setItem(STORAGE_KEYS.ARTICLES, JSON.stringify(serialized));
@@ -227,14 +237,14 @@ export class StorageService implements IStorageService {
   updateArticle(id: string, updates: Partial<Article>): void {
     try {
       const articles = this.getArticles();
-      const index = articles.findIndex(a => a.id === id);
-      
+      const index = articles.findIndex((a) => a.id === id);
+
       if (index === -1) {
         throw new StorageError(`文章不存在 (ID: ${id})`);
       }
-      
+
       articles[index] = { ...articles[index], ...updates };
-      
+
       const serialized = serializeDates(articles);
       localStorage.setItem(STORAGE_KEYS.ARTICLES, JSON.stringify(serialized));
     } catch (error) {
@@ -251,11 +261,14 @@ export class StorageService implements IStorageService {
     try {
       const data = localStorage.getItem(STORAGE_KEYS.NOTES);
       if (!data) return null;
-      
+
       const notes = JSON.parse(data);
-      const deserialized = deserializeDates<Note[]>(notes, ['createdAt', 'updatedAt']);
-      
-      return deserialized.find(n => n.articleId === articleId) || null;
+      const deserialized = deserializeDates<Note[]>(notes, [
+        'createdAt',
+        'updatedAt',
+      ]);
+
+      return deserialized.find((n) => n.articleId === articleId) || null;
     } catch (error) {
       console.error('Failed to get note from storage:', error);
       return null;
@@ -266,16 +279,21 @@ export class StorageService implements IStorageService {
     try {
       const data = localStorage.getItem(STORAGE_KEYS.NOTES);
       const notes: Note[] = data ? JSON.parse(data) : [];
-      const deserialized = deserializeDates<Note[]>(notes, ['createdAt', 'updatedAt']);
-      
-      const existingIndex = deserialized.findIndex(n => n.articleId === note.articleId);
-      
+      const deserialized = deserializeDates<Note[]>(notes, [
+        'createdAt',
+        'updatedAt',
+      ]);
+
+      const existingIndex = deserialized.findIndex(
+        (n) => n.articleId === note.articleId
+      );
+
       if (existingIndex >= 0) {
         deserialized[existingIndex] = note;
       } else {
         deserialized.push(note);
       }
-      
+
       const serialized = serializeDates(deserialized);
       localStorage.setItem(STORAGE_KEYS.NOTES, JSON.stringify(serialized));
     } catch (error) {
@@ -288,11 +306,14 @@ export class StorageService implements IStorageService {
     try {
       const data = localStorage.getItem(STORAGE_KEYS.NOTES);
       if (!data) return;
-      
+
       const notes = JSON.parse(data);
-      const deserialized = deserializeDates<Note[]>(notes, ['createdAt', 'updatedAt']);
-      const filtered = deserialized.filter(n => n.articleId !== articleId);
-      
+      const deserialized = deserializeDates<Note[]>(notes, [
+        'createdAt',
+        'updatedAt',
+      ]);
+      const filtered = deserialized.filter((n) => n.articleId !== articleId);
+
       const serialized = serializeDates(filtered);
       localStorage.setItem(STORAGE_KEYS.NOTES, JSON.stringify(serialized));
     } catch (error) {
@@ -306,11 +327,14 @@ export class StorageService implements IStorageService {
     try {
       const data = localStorage.getItem(STORAGE_KEYS.CHAT_HISTORIES);
       if (!data) return null;
-      
+
       const histories = JSON.parse(data);
-      const deserialized = deserializeDates<ChatHistory[]>(histories, ['createdAt', 'updatedAt']);
-      
-      return deserialized.find(h => h.articleId === articleId) || null;
+      const deserialized = deserializeDates<ChatHistory[]>(histories, [
+        'createdAt',
+        'updatedAt',
+      ]);
+
+      return deserialized.find((h) => h.articleId === articleId) || null;
     } catch (error) {
       console.error('Failed to get chat history from storage:', error);
       return null;
@@ -321,18 +345,26 @@ export class StorageService implements IStorageService {
     try {
       const data = localStorage.getItem(STORAGE_KEYS.CHAT_HISTORIES);
       const histories: ChatHistory[] = data ? JSON.parse(data) : [];
-      const deserialized = deserializeDates<ChatHistory[]>(histories, ['createdAt', 'updatedAt']);
-      
-      const existingIndex = deserialized.findIndex(h => h.articleId === history.articleId);
-      
+      const deserialized = deserializeDates<ChatHistory[]>(histories, [
+        'createdAt',
+        'updatedAt',
+      ]);
+
+      const existingIndex = deserialized.findIndex(
+        (h) => h.articleId === history.articleId
+      );
+
       if (existingIndex >= 0) {
         deserialized[existingIndex] = history;
       } else {
         deserialized.push(history);
       }
-      
+
       const serialized = serializeDates(deserialized);
-      localStorage.setItem(STORAGE_KEYS.CHAT_HISTORIES, JSON.stringify(serialized));
+      localStorage.setItem(
+        STORAGE_KEYS.CHAT_HISTORIES,
+        JSON.stringify(serialized)
+      );
     } catch (error) {
       console.error('Failed to save chat history to storage:', error);
       throw new StorageError('保存聊天历史失败');

@@ -16,7 +16,7 @@ export interface AddFeedButtonProps {
 export function AddFeedButton({ onShowToast }: AddFeedButtonProps) {
   const [url, setUrl] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  
+
   const { feeds, addFeed, addArticles } = useAppStore();
 
   const handleAddFeed = async () => {
@@ -40,7 +40,7 @@ export function AddFeedButton({ onShowToast }: AddFeedButtonProps) {
 
       // 3. 获取订阅源信息
       const feed = await mockRSSService.fetchFeed(url.trim());
-      
+
       // 4. 添加到状态和 LocalStorage
       addFeed(feed);
 
@@ -48,7 +48,7 @@ export function AddFeedButton({ onShowToast }: AddFeedButtonProps) {
       try {
         const articles = await mockRSSService.fetchArticles(feed.url);
         addArticles(articles);
-        
+
         onShowToast(`成功添加订阅源: ${feed.title}`, 'success');
       } catch (articleError) {
         // 即使获取文章失败，订阅源也已添加成功

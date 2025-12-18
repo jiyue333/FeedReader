@@ -1,11 +1,11 @@
 /**
  * 笔记 Tab 组件
- * 
+ *
  * 提供笔记功能的容器，包含：
  * - 笔记列表（按时间倒序）
  * - 添加笔记按钮
  * - 文本选中添加笔记
- * 
+ *
  * 需求: 6.1, 6.2, 6.3, 6.4, 6.5
  */
 
@@ -24,7 +24,9 @@ export function NotesTab({ articleId }: NotesTabProps) {
   const [note, setNote] = useState<Note | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [selectedText, setSelectedText] = useState<string | undefined>(undefined);
+  const [selectedText, setSelectedText] = useState<string | undefined>(
+    undefined
+  );
 
   // 加载笔记（需求 6.4）
   useEffect(() => {

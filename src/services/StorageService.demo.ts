@@ -11,7 +11,7 @@ import type { Feed, Article, Note, ChatHistory } from '../types';
  */
 export function demoFeedOperations() {
   console.log('=== Feed Operations Demo ===');
-  
+
   // 创建测试 Feed
   const testFeed: Feed = {
     id: 'test-feed-1',
@@ -23,20 +23,20 @@ export function demoFeedOperations() {
     createdAt: new Date(),
     updatedAt: new Date(),
   };
-  
+
   // 保存 Feed
   storageService.saveFeed(testFeed);
   console.log('Saved feed:', testFeed);
-  
+
   // 获取所有 Feeds
   const feeds = storageService.getFeeds();
   console.log('All feeds:', feeds);
-  
+
   // 更新 Feed
   storageService.updateFeed('test-feed-1', { unreadCount: 5 });
   const updatedFeeds = storageService.getFeeds();
   console.log('Updated feeds:', updatedFeeds);
-  
+
   // 删除 Feed
   storageService.deleteFeed('test-feed-1');
   const remainingFeeds = storageService.getFeeds();
@@ -48,7 +48,7 @@ export function demoFeedOperations() {
  */
 export function demoArticleOperations() {
   console.log('=== Article Operations Demo ===');
-  
+
   // 创建测试 Articles
   const testArticles: Article[] = [
     {
@@ -73,19 +73,19 @@ export function demoArticleOperations() {
       createdAt: new Date(),
     },
   ];
-  
+
   // 保存 Articles
   storageService.saveArticles(testArticles);
   console.log('Saved articles:', testArticles);
-  
+
   // 获取所有 Articles
   const allArticles = storageService.getArticles();
   console.log('All articles:', allArticles);
-  
+
   // 获取特定 Feed 的 Articles
   const feedArticles = storageService.getArticles('feed-1');
   console.log('Feed articles:', feedArticles);
-  
+
   // 更新 Article
   storageService.updateArticle('article-1', { isRead: true });
   const updatedArticles = storageService.getArticles();
@@ -97,7 +97,7 @@ export function demoArticleOperations() {
  */
 export function demoNoteOperations() {
   console.log('=== Note Operations Demo ===');
-  
+
   // 创建测试 Note
   const testNote: Note = {
     id: 'note-1',
@@ -114,15 +114,15 @@ export function demoNoteOperations() {
     createdAt: new Date(),
     updatedAt: new Date(),
   };
-  
+
   // 保存 Note
   storageService.saveNote(testNote);
   console.log('Saved note:', testNote);
-  
+
   // 获取 Note
   const note = storageService.getNote('article-1');
   console.log('Retrieved note:', note);
-  
+
   // 更新 Note (通过保存相同 articleId 的新 Note)
   const updatedNote: Note = {
     ...testNote,
@@ -140,7 +140,7 @@ export function demoNoteOperations() {
   storageService.saveNote(updatedNote);
   const retrievedUpdatedNote = storageService.getNote('article-1');
   console.log('Updated note:', retrievedUpdatedNote);
-  
+
   // 删除 Note
   storageService.deleteNote('article-1');
   const deletedNote = storageService.getNote('article-1');
@@ -152,7 +152,7 @@ export function demoNoteOperations() {
  */
 export function demoChatHistoryOperations() {
   console.log('=== ChatHistory Operations Demo ===');
-  
+
   // 创建测试 ChatHistory
   const testChatHistory: ChatHistory = {
     id: 'chat-1',
@@ -174,15 +174,15 @@ export function demoChatHistoryOperations() {
     createdAt: new Date(),
     updatedAt: new Date(),
   };
-  
+
   // 保存 ChatHistory
   storageService.saveChatHistory(testChatHistory);
   console.log('Saved chat history:', testChatHistory);
-  
+
   // 获取 ChatHistory
   const chatHistory = storageService.getChatHistory('article-1');
   console.log('Retrieved chat history:', chatHistory);
-  
+
   // 更新 ChatHistory (添加新消息)
   const updatedChatHistory: ChatHistory = {
     ...testChatHistory,
@@ -207,7 +207,7 @@ export function demoChatHistoryOperations() {
  */
 export function demoDateSerialization() {
   console.log('=== Date Serialization Demo ===');
-  
+
   const testFeed: Feed = {
     id: 'date-test-feed',
     title: 'Date Test',
@@ -217,29 +217,31 @@ export function demoDateSerialization() {
     updatedAt: new Date('2024-01-15T12:00:00Z'),
     lastFetchedAt: new Date('2024-01-15T11:00:00Z'),
   };
-  
+
   // 保存并重新获取
   storageService.saveFeed(testFeed);
-  const retrieved = storageService.getFeeds().find(f => f.id === 'date-test-feed');
-  
+  const retrieved = storageService
+    .getFeeds()
+    .find((f) => f.id === 'date-test-feed');
+
   console.log('Original dates:', {
     createdAt: testFeed.createdAt,
     updatedAt: testFeed.updatedAt,
     lastFetchedAt: testFeed.lastFetchedAt,
   });
-  
+
   console.log('Retrieved dates:', {
     createdAt: retrieved?.createdAt,
     updatedAt: retrieved?.updatedAt,
     lastFetchedAt: retrieved?.lastFetchedAt,
   });
-  
+
   console.log('Dates are Date objects:', {
     createdAt: retrieved?.createdAt instanceof Date,
     updatedAt: retrieved?.updatedAt instanceof Date,
     lastFetchedAt: retrieved?.lastFetchedAt instanceof Date,
   });
-  
+
   // 清理
   storageService.deleteFeed('date-test-feed');
 }
@@ -249,21 +251,21 @@ export function demoDateSerialization() {
  */
 export function runAllDemos() {
   console.log('Starting StorageService demos...\n');
-  
+
   demoFeedOperations();
   console.log('\n');
-  
+
   demoArticleOperations();
   console.log('\n');
-  
+
   demoNoteOperations();
   console.log('\n');
-  
+
   demoChatHistoryOperations();
   console.log('\n');
-  
+
   demoDateSerialization();
   console.log('\n');
-  
+
   console.log('All demos completed!');
 }

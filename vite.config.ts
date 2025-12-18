@@ -17,16 +17,16 @@ export default defineConfig({
           // UI 组件库
           'ui-vendor': ['@headlessui/react'],
           // Markdown 渲染相关
-          'markdown': [
+          markdown: [
             'react-markdown',
             'remark-gfm',
             'rehype-raw',
             'rehype-highlight',
           ],
           // 状态管理
-          'state': ['zustand'],
+          state: ['zustand'],
           // 虚拟滚动
-          'virtual': ['@tanstack/react-virtual'],
+          virtual: ['@tanstack/react-virtual'],
         },
       },
     },

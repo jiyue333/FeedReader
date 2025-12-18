@@ -15,46 +15,46 @@ export interface TableOfContentsProps {
 
 /**
  * 从 Markdown 内容中提取标题
- * 
+ *
  * 解析 h1-h6 标题，生成层级结构
  * 需求: 5.1
  */
 export function extractHeadings(markdown: string): Heading[] {
   const headings: Heading[] = [];
-  
+
   // 匹配 Markdown 标题格式: # 标题, ## 标题, 等
   const headingRegex = /^(#{1,6})\s+(.+)$/gm;
   let match;
-  
+
   while ((match = headingRegex.exec(markdown)) !== null) {
     const level = match[1].length; // # 的数量表示层级
     const text = match[2].trim();
-    
+
     // 生成唯一 ID（基于文本内容）
     const id = text
       .toLowerCase()
       .replace(/[^\w\u4e00-\u9fa5]+/g, '-') // 保留中文字符
       .replace(/^-+|-+$/g, '');
-    
+
     headings.push({
       id: id || `heading-${headings.length}`,
       level,
       text,
     });
   }
-  
+
   return headings;
 }
 
 /**
  * TableOfContents 组件
- * 
+ *
  * 功能：
  * - 解析并显示文章的层级目录
  * - 点击目录项滚动到对应章节
  * - 滚动时高亮当前目录项
  * - 处理无标题文章的空状态
- * 
+ *
  * 需求: 5.1, 5.2, 5.3, 5.4, 5.5
  */
 function TableOfContents({ content }: TableOfContentsProps) {
@@ -76,11 +76,11 @@ function TableOfContents({ content }: TableOfContentsProps) {
       const headingElements = headings
         .map((heading) => {
           // 尝试多种方式查找元素
-          const element = 
+          const element =
             document.getElementById(heading.id) ||
-            Array.from(document.querySelectorAll('h1, h2, h3, h4, h5, h6')).find(
-              (el) => el.textContent?.trim() === heading.text
-            );
+            Array.from(
+              document.querySelectorAll('h1, h2, h3, h4, h5, h6')
+            ).find((el) => el.textContent?.trim() === heading.text);
           return { heading, element };
         })
         .filter((item) => item.element !== null && item.element !== undefined);
@@ -119,7 +119,7 @@ function TableOfContents({ content }: TableOfContentsProps) {
   // 点击目录项，滚动到对应章节
   const handleHeadingClick = useCallback((heading: Heading) => {
     // 尝试多种方式查找元素
-    const element = 
+    const element =
       document.getElementById(heading.id) ||
       Array.from(document.querySelectorAll('h1, h2, h3, h4, h5, h6')).find(
         (el) => el.textContent?.trim() === heading.text
@@ -157,17 +157,16 @@ function TableOfContents({ content }: TableOfContentsProps) {
             onClick={() => handleHeadingClick(heading)}
             className={`
               w-full text-left text-sm py-1.5 px-2 rounded transition-colors
-              ${isActive 
-                ? 'bg-blue-50 text-blue-700 font-medium' 
-                : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
+              ${
+                isActive
+                  ? 'bg-blue-50 text-blue-700 font-medium'
+                  : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
               }
             `}
             style={{ paddingLeft: `${paddingLeft + 8}px` }}
             title={heading.text}
           >
-            <span className="block truncate">
-              {heading.text}
-            </span>
+            <span className="block truncate">{heading.text}</span>
           </button>
         );
       })}

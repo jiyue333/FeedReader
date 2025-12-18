@@ -1,8 +1,8 @@
 /**
  * 添加笔记对话框组件
- * 
+ *
  * 显示选中的文字（如果有）并提供输入框添加笔记
- * 
+ *
  * 需求: 6.3
  */
 
@@ -15,7 +15,12 @@ export interface AddNoteDialogProps {
   onCancel: () => void;
 }
 
-export function AddNoteDialog({ isOpen, quotedText, onSave, onCancel }: AddNoteDialogProps) {
+export function AddNoteDialog({
+  isOpen,
+  quotedText,
+  onSave,
+  onCancel,
+}: AddNoteDialogProps) {
   const [content, setContent] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -32,7 +37,7 @@ export function AddNoteDialog({ isOpen, quotedText, onSave, onCancel }: AddNoteD
   const handleSave = () => {
     const trimmedContent = content.trim();
     if (!trimmedContent) return;
-    
+
     onSave(trimmedContent);
     setContent('');
   };
@@ -62,8 +67,18 @@ export function AddNoteDialog({ isOpen, quotedText, onSave, onCancel }: AddNoteD
             className="text-gray-400 hover:text-gray-600 transition-colors"
             aria-label="关闭"
           >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            <svg
+              className="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
             </svg>
           </button>
         </div>
@@ -73,7 +88,9 @@ export function AddNoteDialog({ isOpen, quotedText, onSave, onCancel }: AddNoteD
           {/* 引用的文字 */}
           {quotedText && (
             <div className="mb-4 p-4 bg-amber-50 border-l-4 border-amber-500 rounded">
-              <p className="text-sm text-gray-700 whitespace-pre-wrap">{quotedText}</p>
+              <p className="text-sm text-gray-700 whitespace-pre-wrap">
+                {quotedText}
+              </p>
             </div>
           )}
 

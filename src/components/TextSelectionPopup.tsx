@@ -1,8 +1,8 @@
 /**
  * 文本选中浮动按钮组件
- * 
+ *
  * 当用户在文章中选中文字时，显示浮动的"添加笔记"按钮
- * 
+ *
  * 需求: 6.3
  */
 
@@ -28,9 +28,13 @@ export function TextSelectionPopup({ onAddNote }: TextSelectionPopupProps) {
 
       if (text && text.length > 0) {
         // 检查选中的文本是否来自文章内容区域
-        const articleContentElement = document.querySelector('[data-article-content]');
+        const articleContentElement = document.querySelector(
+          '[data-article-content]'
+        );
         if (articleContentElement && selection?.anchorNode) {
-          const isFromArticle = articleContentElement.contains(selection.anchorNode);
+          const isFromArticle = articleContentElement.contains(
+            selection.anchorNode
+          );
 
           if (isFromArticle && selection.rangeCount > 0) {
             const range = selection.getRangeAt(0);

@@ -13,10 +13,16 @@ async function demoMockRSSService() {
   const validUrl = 'https://techcrunch.com/feed/';
   const invalidUrl1 = 'not-a-url';
   const invalidUrl2 = 'http://invalid';
-  
-  console.log(`  ${validUrl}: ${await mockRSSService.validateFeedUrl(validUrl)}`);
-  console.log(`  ${invalidUrl1}: ${await mockRSSService.validateFeedUrl(invalidUrl1)}`);
-  console.log(`  ${invalidUrl2}: ${await mockRSSService.validateFeedUrl(invalidUrl2)}`);
+
+  console.log(
+    `  ${validUrl}: ${await mockRSSService.validateFeedUrl(validUrl)}`
+  );
+  console.log(
+    `  ${invalidUrl1}: ${await mockRSSService.validateFeedUrl(invalidUrl1)}`
+  );
+  console.log(
+    `  ${invalidUrl2}: ${await mockRSSService.validateFeedUrl(invalidUrl2)}`
+  );
   console.log();
 
   // 2. 测试获取订阅源

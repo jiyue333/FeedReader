@@ -19,9 +19,10 @@ export function FeedItem({ feed, isActive, onClick }: FeedItemProps) {
       onClick={() => onClick(feed.id)}
       className={`
         p-3 rounded-md cursor-pointer transition-all
-        ${isActive 
-          ? 'bg-blue-50 border-2 border-blue-500 shadow-md' 
-          : 'bg-white border-2 border-transparent hover:shadow-md'
+        ${
+          isActive
+            ? 'bg-blue-50 border-2 border-blue-500 shadow-md'
+            : 'bg-white border-2 border-transparent hover:shadow-md'
         }
         ${hasUnread ? 'font-semibold' : ''}
       `}
@@ -48,7 +49,9 @@ export function FeedItem({ feed, isActive, onClick }: FeedItemProps) {
 
           {/* 订阅源标题 */}
           <div className="flex-1 min-w-0">
-            <div className={`text-sm truncate ${hasUnread ? 'text-gray-900' : 'text-gray-700'}`}>
+            <div
+              className={`text-sm truncate ${hasUnread ? 'text-gray-900' : 'text-gray-700'}`}
+            >
               {feed.title}
             </div>
           </div>

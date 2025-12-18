@@ -1,8 +1,8 @@
 /**
  * 聊天输入组件
- * 
+ *
  * 提供消息输入框和发送按钮
- * 
+ *
  * 需求: 7.1
  */
 
@@ -14,17 +14,17 @@ export interface ChatInputProps {
   placeholder?: string;
 }
 
-export function ChatInput({ 
-  onSend, 
+export function ChatInput({
+  onSend,
   disabled = false,
-  placeholder = '输入消息...'
+  placeholder = '输入消息...',
 }: ChatInputProps) {
   const [message, setMessage] = useState('');
 
   const handleSend = () => {
     const trimmedMessage = message.trim();
     if (!trimmedMessage || disabled) return;
-    
+
     onSend(trimmedMessage);
     setMessage('');
   };
@@ -49,7 +49,7 @@ export function ChatInput({
         rows={3}
         className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
       />
-      
+
       {/* 发送按钮 */}
       <button
         onClick={handleSend}

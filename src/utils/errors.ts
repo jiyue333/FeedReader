@@ -61,27 +61,27 @@ export function getErrorMessage(error: unknown): string {
   if (error instanceof ValidationError) {
     return error.message;
   }
-  
+
   if (error instanceof NetworkError) {
     return '网络连接失败，请检查网络设置';
   }
-  
+
   if (error instanceof StorageError) {
     return '数据保存失败，请检查浏览器存储空间';
   }
-  
+
   if (error instanceof AIServiceError) {
     return 'AI 服务暂时不可用，请稍后重试';
   }
-  
+
   if (error instanceof TimeoutError) {
     return '请求超时，请稍后重试';
   }
-  
+
   if (error instanceof Error) {
     return error.message || '操作失败，请稍后重试';
   }
-  
+
   return '未知错误，请稍后重试';
 }
 

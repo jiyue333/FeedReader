@@ -20,7 +20,9 @@ function LoadingFallback() {
 }
 
 function App() {
-  const initializeFromStorage = useAppStore((state) => state.initializeFromStorage);
+  const initializeFromStorage = useAppStore(
+    (state) => state.initializeFromStorage
+  );
 
   // 初始化：从 LocalStorage 加载数据
   useEffect(() => {

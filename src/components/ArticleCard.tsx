@@ -52,14 +52,15 @@ export function ArticleCard({ article, feed, onClick }: ArticleCardProps) {
       onClick={handleClick}
       className={`
         p-4 border rounded-lg cursor-pointer transition-all hover:shadow-md
-        ${article.isRead 
-          ? 'bg-gray-50 border-gray-200 text-gray-600' 
-          : 'bg-white border-gray-300 text-gray-900'
+        ${
+          article.isRead
+            ? 'bg-gray-50 border-gray-200 text-gray-600'
+            : 'bg-white border-gray-300 text-gray-900'
         }
       `}
     >
       {/* 标题 */}
-      <h3 
+      <h3
         className={`
           text-lg font-semibold mb-2 line-clamp-2
           ${article.isRead ? 'text-gray-600' : 'text-gray-900'}
@@ -80,22 +81,14 @@ export function ArticleCard({ article, feed, onClick }: ArticleCardProps) {
         <div className="flex items-center gap-3">
           {/* 来源名称 */}
           {feed && (
-            <span className="font-medium text-blue-600">
-              {feed.title}
-            </span>
+            <span className="font-medium text-blue-600">{feed.title}</span>
           )}
 
           {/* 作者 */}
-          {article.author && (
-            <span>
-              {article.author}
-            </span>
-          )}
+          {article.author && <span>{article.author}</span>}
 
           {/* 发布时间 */}
-          <span>
-            {formatDate(article.publishedAt)}
-          </span>
+          <span>{formatDate(article.publishedAt)}</span>
         </div>
 
         {/* 已读/未读标识 */}

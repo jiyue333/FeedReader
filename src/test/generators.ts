@@ -62,9 +62,7 @@ export const markdownWithHeadingsArbitrary = fc
     { minLength: 1, maxLength: 10 }
   )
   .map((headings) =>
-    headings
-      .map(([level, text]) => `${'#'.repeat(level)} ${text}`)
-      .join('\n\n')
+    headings.map(([level, text]) => `${'#'.repeat(level)} ${text}`).join('\n\n')
   );
 
 /**

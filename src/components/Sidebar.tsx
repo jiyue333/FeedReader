@@ -16,16 +16,21 @@ export interface SidebarProps {
   onShowToast: (message: string, type: ToastType) => void;
 }
 
-export function Sidebar({ feeds, activeFeedId, onFeedSelect, onShowToast }: SidebarProps) {
+export function Sidebar({
+  feeds,
+  activeFeedId,
+  onFeedSelect,
+  onShowToast,
+}: SidebarProps) {
   return (
     <div className="w-64 bg-gray-50 border-r border-gray-200 flex flex-col h-full">
       {/* 头部 */}
       <div className="p-4 border-b border-gray-200 bg-white">
         <h2 className="text-xl font-bold text-gray-800 mb-3">订阅源</h2>
-        
+
         {/* 添加订阅源按钮 */}
         <AddFeedButton onShowToast={onShowToast} />
-        
+
         {/* 刷新按钮 */}
         <RefreshButton onShowToast={onShowToast} />
       </div>

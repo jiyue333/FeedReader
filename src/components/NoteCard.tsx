@@ -1,8 +1,8 @@
 /**
  * 笔记卡片组件
- * 
+ *
  * 显示单条笔记，包含引用文字、笔记内容、时间戳和操作按钮
- * 
+ *
  * 需求: 6.1, 6.5
  */
 
@@ -22,7 +22,7 @@ export function NoteCard({ note, onEdit, onDelete }: NoteCardProps) {
   const handleSave = () => {
     const trimmedContent = editContent.trim();
     if (!trimmedContent) return;
-    
+
     onEdit(note.id, trimmedContent);
     setIsEditing(false);
   };
@@ -49,7 +49,7 @@ export function NoteCard({ note, onEdit, onDelete }: NoteCardProps) {
     if (minutes < 60) return `${minutes}分钟前`;
     if (hours < 24) return `${hours}小时前`;
     if (days < 7) return `${days}天前`;
-    
+
     return date.toLocaleDateString('zh-CN', {
       year: 'numeric',
       month: '2-digit',
@@ -64,7 +64,9 @@ export function NoteCard({ note, onEdit, onDelete }: NoteCardProps) {
       {/* 引用的文字 */}
       {note.quotedText && (
         <div className="mb-3 p-3 bg-amber-50 border-l-4 border-amber-500 rounded">
-          <p className="text-sm text-gray-700 whitespace-pre-wrap">{note.quotedText}</p>
+          <p className="text-sm text-gray-700 whitespace-pre-wrap">
+            {note.quotedText}
+          </p>
         </div>
       )}
 
@@ -95,13 +97,15 @@ export function NoteCard({ note, onEdit, onDelete }: NoteCardProps) {
           </div>
         </div>
       ) : (
-        <p className="text-sm text-gray-800 whitespace-pre-wrap mb-3">{note.content}</p>
+        <p className="text-sm text-gray-800 whitespace-pre-wrap mb-3">
+          {note.content}
+        </p>
       )}
 
       {/* 底部信息栏 */}
       <div className="flex items-center justify-between text-xs text-gray-500">
         <span>{formatTime(note.createdAt)}</span>
-        
+
         {!isEditing && (
           <div className="flex items-center space-x-3">
             <button

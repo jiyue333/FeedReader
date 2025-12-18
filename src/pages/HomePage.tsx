@@ -6,7 +6,13 @@ import { useToast } from '../hooks/useToast';
 
 function HomePage() {
   const { feedId } = useParams<{ feedId: string }>();
-  const { feeds, articles, activeFeedId, setActiveFeedId, initializeFromStorage } = useAppStore();
+  const {
+    feeds,
+    articles,
+    activeFeedId,
+    setActiveFeedId,
+    initializeFromStorage,
+  } = useAppStore();
   const { toast, showToast, hideToast } = useToast();
 
   // 初始化：从 LocalStorage 加载数据
@@ -29,7 +35,9 @@ function HomePage() {
   };
 
   // 获取当前选中的订阅源
-  const activeFeed = activeFeedId ? feeds.find(f => f.id === activeFeedId) : undefined;
+  const activeFeed = activeFeedId
+    ? feeds.find((f) => f.id === activeFeedId)
+    : undefined;
 
   return (
     <div className="flex h-screen">

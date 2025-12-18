@@ -16,7 +16,13 @@ export interface ToastProps {
   duration?: number;
 }
 
-export function Toast({ message, type, isVisible, onClose, duration = 3000 }: ToastProps) {
+export function Toast({
+  message,
+  type,
+  isVisible,
+  onClose,
+  duration = 3000,
+}: ToastProps) {
   useEffect(() => {
     if (isVisible && duration > 0) {
       const timer = setTimeout(() => {
@@ -52,7 +58,9 @@ export function Toast({ message, type, isVisible, onClose, duration = 3000 }: To
       leaveTo="opacity-0"
     >
       <div className="fixed top-4 right-4 z-50">
-        <div className={`${bgColorClass} text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-3 min-w-[300px]`}>
+        <div
+          className={`${bgColorClass} text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-3 min-w-[300px]`}
+        >
           <span className="text-xl font-bold">{iconMap[type]}</span>
           <span className="flex-1">{message}</span>
           <button

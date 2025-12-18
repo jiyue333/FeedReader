@@ -1,6 +1,6 @@
 /**
  * Store 使用示例
- * 
+ *
  * 这个文件演示了如何使用 Zustand store
  * 可以在浏览器控制台中运行这些示例
  */
@@ -13,7 +13,7 @@ import type { Feed, Article } from '../types';
  */
 export function demoAddFeed() {
   const store = useAppStore.getState();
-  
+
   const newFeed: Feed = {
     id: 'demo-feed-1',
     title: 'Demo Feed',
@@ -24,7 +24,7 @@ export function demoAddFeed() {
     createdAt: new Date(),
     updatedAt: new Date(),
   };
-  
+
   store.addFeed(newFeed);
   console.log('Feed added:', newFeed);
   console.log('Current feeds:', store.feeds);
@@ -35,7 +35,7 @@ export function demoAddFeed() {
  */
 export function demoAddArticles() {
   const store = useAppStore.getState();
-  
+
   const articles: Article[] = [
     {
       id: 'demo-article-1',
@@ -60,7 +60,7 @@ export function demoAddArticles() {
       createdAt: new Date(),
     },
   ];
-  
+
   store.addArticles(articles);
   console.log('Articles added:', articles);
   console.log('Current articles:', store.articles);
@@ -72,12 +72,15 @@ export function demoAddArticles() {
  */
 export function demoMarkAsRead() {
   const store = useAppStore.getState();
-  
+
   const firstArticle = store.articles[0];
   if (firstArticle) {
     store.markAsRead(firstArticle.id);
     console.log('Article marked as read:', firstArticle.id);
-    console.log('Updated article:', store.articles.find(a => a.id === firstArticle.id));
+    console.log(
+      'Updated article:',
+      store.articles.find((a) => a.id === firstArticle.id)
+    );
     console.log('Updated feeds with unread counts:', store.feeds);
   }
 }
@@ -87,7 +90,7 @@ export function demoMarkAsRead() {
  */
 export function demoSetActiveFeed() {
   const store = useAppStore.getState();
-  
+
   const firstFeed = store.feeds[0];
   if (firstFeed) {
     store.setActiveFeedId(firstFeed.id);
@@ -101,7 +104,7 @@ export function demoSetActiveFeed() {
  */
 export function demoInitializeFromStorage() {
   const store = useAppStore.getState();
-  
+
   store.initializeFromStorage();
   console.log('Store initialized from LocalStorage');
   console.log('Feeds:', store.feeds);
@@ -113,15 +116,15 @@ export function demoInitializeFromStorage() {
  */
 export function demoRemoveFeed() {
   const store = useAppStore.getState();
-  
+
   const firstFeed = store.feeds[0];
   if (firstFeed) {
     console.log('Before removal:');
     console.log('Feeds:', store.feeds.length);
     console.log('Articles:', store.articles.length);
-    
+
     store.removeFeed(firstFeed.id);
-    
+
     console.log('After removal:');
     console.log('Feeds:', store.feeds.length);
     console.log('Articles:', store.articles.length);
@@ -135,16 +138,16 @@ export function demoRemoveFeed() {
 export function runAllDemos() {
   console.log('=== Demo 1: Add Feed ===');
   demoAddFeed();
-  
+
   console.log('\n=== Demo 2: Add Articles ===');
   demoAddArticles();
-  
+
   console.log('\n=== Demo 3: Mark As Read ===');
   demoMarkAsRead();
-  
+
   console.log('\n=== Demo 4: Set Active Feed ===');
   demoSetActiveFeed();
-  
+
   console.log('\n=== Demo 5: Initialize From Storage ===');
   demoInitializeFromStorage();
 }
