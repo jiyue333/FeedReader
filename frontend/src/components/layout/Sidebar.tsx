@@ -1,20 +1,53 @@
 "use client";
 
 import { useState } from "react";
+import { StagingItem } from "./AppShell";
+
+interface SidebarProps {
+  stagingItems: StagingItem[];
+  onAddToStaging: (item: StagingItem) => void;
+  onRemoveFromStaging: (id: string) => void;
+  onClearStaging: () => void;
+}
 
 /**
  * Left sidebar component.
  * Upper: Feed sources list
  * Lower: Staging dock for selected articles
  */
-export default function Sidebar() {
+export default function Sidebar({
+  stagingItems,
+  onAddToStaging,
+  onRemoveFromStaging,
+  onClearStaging,
+}: SidebarProps) {
   const [selectedFeed, setSelectedFeed] = useState<string | null>("all");
-  const [stagingItems, setStagingItems] = useState<{ id: string; title: string }[]>([
-    // Demo items
-    { id: "1", title: "Understanding RAG Architecture" },
-    { id: "2", title: "Next.js 15 New Features" },
-  ]);
-  const [allSelected, setAllSelected] = useState(false);
+  const [selectedItemIds, setSelectedItemIds] = useState<Set<string>>(new Set());
+  const [isDragOver, setIsDragOver] = useState(false);
+
+  // Sync "Select All" state with actual selections
+  const allSelected = selectedItemIds.size > 0 && selectedItemIds.size === stagingItems.length;
+  const someSelected = selectedItemIds.size > 0 && selectedItemIds.size < stagingItems.length;
+
+  const handleSelectAll = () => {
+    if (allSelected) {
+      // Unselect all
+      setSelectedItemIds(new Set());
+    } else {
+      // Select all
+      setSelectedItemIds(new Set(stagingItems.map(item => item.id)));
+    }
+  };
+
+  const handleToggleItem = (id: string) => {
+    const newSelection = new Set(selectedItemIds);
+    if (newSelection.has(id)) {
+      newSelection.delete(id);
+    } else {
+      newSelection.add(id);
+    }
+    setSelectedItemIds(newSelection);
+  };
 
   const feeds = [
     { id: "all", name: "All Feeds", icon: "📚", count: 24 },
@@ -22,6 +55,44 @@ export default function Sidebar() {
     { id: "tech", name: "Tech News", icon: "🔧", count: 12 },
     { id: "ai", name: "AI Research", icon: "🤖", count: 8 },
   ];
+
+  // Handle drop from AI panel citations
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(false);
+
+    try {
+      // Try application/json first, fallback to text/plain
+      const dataStr = e.dataTransfer.getData("application/json") ||
+        e.dataTransfer.getData("text/plain");
+
+      if (!dataStr) {
+        console.warn("No data in drop event");
+        return;
+      }
+
+      const item = JSON.parse(dataStr) as StagingItem;
+
+      // Validate required fields
+      if (!item.id || !item.title) {
+        console.warn("Invalid item data:", item);
+        return;
+      }
+
+      onAddToStaging(item);
+    } catch (error) {
+      console.error("Failed to parse dropped data:", error);
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(true);
+  };
+
+  const handleDragLeave = () => {
+    setIsDragOver(false);
+  };
 
   return (
     <aside
@@ -61,11 +132,8 @@ export default function Sidebar() {
                 <span>{feed.name}</span>
               </span>
               <span
-                className="rounded-full px-2 py-0.5 text-xs"
-                style={{
-                  backgroundColor: "var(--color-bg-elevated)",
-                  color: "var(--color-text-secondary)",
-                }}
+                className="text-xs"
+                style={{ color: "var(--color-text-muted)" }}
               >
                 {feed.count}
               </span>
@@ -74,13 +142,10 @@ export default function Sidebar() {
         </nav>
 
         {/* Add Source Button */}
-        <div className="border-t px-3 py-2" style={{ borderColor: "var(--color-border)" }}>
+        <div className="border-t px-2 py-2" style={{ borderColor: "var(--color-border)" }}>
           <button
-            className="flex w-full items-center justify-center gap-2 rounded-lg border border-dashed py-2 text-sm transition-colors hover:border-solid"
-            style={{
-              borderColor: "var(--color-border)",
-              color: "var(--color-text-secondary)",
-            }}
+            className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors hover:bg-[var(--color-bg-tertiary)]"
+            style={{ color: "var(--color-text-secondary)" }}
           >
             <svg
               className="h-4 w-4"
@@ -98,30 +163,34 @@ export default function Sidebar() {
 
       {/* Lower: Staging Dock */}
       <div
-        className="flex h-2/5 flex-col border-t"
+        className="flex h-[40%] flex-col border-t"
         style={{ borderColor: "var(--color-border)" }}
+        onDrop={handleDrop}
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
       >
-        {/* Staging Header */}
-        <div className="flex flex-col gap-2 px-4 py-3">
+        {/* Header */}
+        <div className="px-4 py-3 space-y-2">
           <div className="flex items-center justify-between">
             <h2
-              className="text-xs font-semibold uppercase tracking-wider"
-              style={{ color: "var(--color-text-muted)" }}
+              className="text-sm font-semibold"
+              style={{ color: "var(--color-text-primary)" }}
             >
               Staging ({stagingItems.length})
             </h2>
             <button
-              onClick={() => setAllSelected(!allSelected)}
+              onClick={handleSelectAll}
               className="text-xs transition-colors hover:underline"
               style={{ color: "var(--color-primary)" }}
             >
-              {allSelected ? "Deselect All" : "Select All"}
+              {allSelected ? "Unselect All" : "Select All"}
             </button>
           </div>
 
           {/* Generate Takeaway Button */}
           <button
-            className="flex w-full items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-medium transition-all hover:opacity-90"
+            disabled={stagingItems.length === 0}
+            className="flex w-full items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             style={{
               backgroundColor: "var(--color-primary)",
               color: "#000",
@@ -141,14 +210,18 @@ export default function Sidebar() {
         </div>
 
         {/* Staging Items List */}
-        <div className="flex-1 overflow-y-auto px-2 pb-2">
+        <div
+          className={`flex-1 overflow-y-auto px-2 pb-2 transition-colors ${isDragOver ? "bg-[var(--color-primary)]/10" : ""
+            }`}
+        >
           {stagingItems.length === 0 ? (
             <div
-              className="flex h-full items-center justify-center text-center text-sm"
+              className="flex h-full items-center justify-center text-center text-sm p-4"
               style={{ color: "var(--color-text-muted)" }}
             >
               <p>
-                Drag articles here or<br />
+                Drag articles here or
+                <br />
                 click + to add
               </p>
             </div>
@@ -160,18 +233,27 @@ export default function Sidebar() {
               >
                 <input
                   type="checkbox"
-                  checked={allSelected}
-                  onChange={() => {}}
+                  checked={selectedItemIds.has(item.id)}
+                  onChange={() => handleToggleItem(item.id)}
                   className="mt-1 h-4 w-4 rounded border-[var(--color-border)] accent-[var(--color-primary)]"
                 />
-                <span
-                  className="flex-1 text-sm truncate-2"
-                  style={{ color: "var(--color-text-primary)" }}
-                >
-                  {item.title}
-                </span>
+                <div className="flex-1 min-w-0">
+                  <p
+                    className="text-sm line-clamp-2"
+                    style={{ color: "var(--color-text-primary)" }}
+                  >
+                    {item.title}
+                  </p>
+                  <p
+                    className="text-xs mt-0.5 truncate"
+                    style={{ color: "var(--color-text-muted)" }}
+                  >
+                    {item.source}
+                  </p>
+                </div>
                 <button
-                  className="shrink-0 text-[var(--color-text-muted)] hover:text-[var(--color-error)]"
+                  onClick={() => onRemoveFromStaging(item.id)}
+                  className="shrink-0 text-[var(--color-text-muted)] hover:text-[var(--color-error)] transition-colors"
                   title="Remove from staging"
                 >
                   <svg

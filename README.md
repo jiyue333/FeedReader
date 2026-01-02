@@ -29,6 +29,7 @@ AnkiFlow/
 
 - Node.js 18+
 - Python 3.11+
+- Conda (Anaconda or Miniconda)
 - Docker & Docker Compose
 
 ### 1. Clone and Configure
@@ -52,14 +53,15 @@ docker-compose up -d
 docker-compose ps
 ```
 
-### 3. Setup Backend
+### 3. Setup Backend (with Conda)
 
 ```bash
-cd backend
+# Create and activate conda environment
+conda create -n ankiflow python=3.11 -y
+conda activate ankiflow
 
-# Create virtual environment
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+# Navigate to backend directory
+cd backend
 
 # Install dependencies
 pip install -r requirements.txt
@@ -71,12 +73,16 @@ alembic upgrade head
 uvicorn app.main:app --reload --port 8000
 ```
 
-> **Note**: The `.env` file can be placed in either the project root or the `backend/` directory. 
-> The application will automatically detect and load it from either location.
+> **Note**: 
+> - The conda environment is named `ankiflow`
+> - Always activate the conda environment before working on the backend: `conda activate ankiflow`
+> - The `.env` file can be placed in either the project root or the `backend/` directory
+> - The application will automatically detect and load it from either location
 
 ### 4. Setup Frontend
 
 ```bash
+# Open a new terminal (keep backend running)
 cd frontend
 
 # Install dependencies
@@ -91,6 +97,22 @@ npm run dev
 - Frontend: http://localhost:3000
 - Backend API: http://localhost:8000/api
 - API Docs: http://localhost:8000/api/docs
+
+## 🔄 Daily Development Workflow
+
+```bash
+# 1. Start database (if not already running)
+docker-compose up -d
+
+# 2. Start backend
+conda activate ankiflow
+cd backend
+uvicorn app.main:app --reload --port 8000
+
+# 3. Start frontend (in a new terminal)
+cd frontend
+npm run dev
+```
 
 ## 🛠️ Development
 
