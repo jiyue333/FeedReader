@@ -1,4 +1,4 @@
-# AnkiFlow - UI 设计规范文档 (v2.2)
+# AnkiFlow - UI 设计规范文档 (v3.0)
 
 ## 1. 设计哲学 (Design Philosophy)
 
@@ -63,41 +63,29 @@
 
 **页面目标**: 深度阅读，建立连接，在不被打扰的前提下补充暂存区。
 
-### 3.1 顶部工具栏 (Sticky Header)
-*   **布局**: 极简，向两侧停靠。
-*   **Left**:
-    *   `Breadcrumbs` (路径): `Library / Tech / LLM` (浅灰色，点击路径节点可返回对应层级，替代 Back 按钮).
-*   **Right**:
-    *   `[Toggle Sidebar]` (切换左侧栏).
-    *   `[...]` (**Reader Actions**): 点击展开下拉菜单，包含：
-        *   `Font Settings` (字号/主题).
-        *   `Export Article`.
-        *   `View Metadata`.
-        *   (预留槽位).
+### 3.1 顶部导航栏 (Global Top Bar - Compact Mode)
+
+- **布局**: 复用首页顶部栏结构，但在阅读模式下 **高度压缩 (Compact)**，并向两侧严格停靠，中间完全留白以减少视觉干扰。
+- **Left**:Logo (Icon Only): 点击返回首页 / Dashboard。[Toggle Left Sidebar] (侧边栏开关图标).
+- **Center**: **(Empty / Transparent)** —— 留白，让视线穿透。
+- **Right**:Search Icon: (搜索框收缩为一个图标，点击展开).[...] (**Global More**): 全局设置入口。User Avatar: 用户头像。[Toggle Right Sidebar] (AI 栏开关图标).
 
 ### 3.2 中间阅读区 (Reader Canvas)
-*   **布局**: 居中，最大宽度 800px。
-*   **Action Bar (标题上方)**:
-    *   **Left**: (留白，或显示阅读进度百分比).
-    *   **Right**:
-        *   `[Pin]` (暂存状态开关).
-        *   `[Graph]` (触发知识图谱模态窗).
-        *   `[+]` (拓展按钮：用于未来添加“翻译”、“朗读”等插件功能).
-*   **Content**:
-    *   **H1 Title**: 巨型标题。
-    *   **Body**: 正文内容。
+
+- **布局**: 居中，最大宽度 800px。
+- **Context Bar (位于 H1 标题上方)**:这是一个属于文章内容的 “信息栏”，随文章内容滚动（或在滚动到顶部时吸附）。**Left (Path)**:Breadcrumbs: Library / Tech / LLM (浅灰色小字，**单行不换行**，点击节点可跳转)。**Right (Article Actions)**:[Pin] (**Staging Switch**): 核心功能，实心表示已暂存。[Graph]: 触发知识图谱模态窗。[+] (**Extension Slot**): 预留给未来插件（如 “翻译”、“朗读”、“Web Archive”）。[...]: 更多文章操作（如导出 PDF、复制链接、字号设置）。
+- **Content**:**H1 Title**: 巨型标题。**Metadata**: 作者、时间、原文链接。**Body**: 正文内容。
 
 ### 3.3 左侧栏 (Sidebar - Reuse)
-*   **状态**: 默认展开。
-*   **Upper**: **Table of Contents (TOC)** (支持折叠).
-*   **Lower**: **Staging Dock** (复用首页组件，保持一致性).
+
+- **状态**: 默认展开。
+- **Upper**: **Table of Contents (TOC)** (支持折叠).
+- **Lower**: **Staging Dock** (复用首页组件，保持一致性).
 
 ### 3.4 右侧栏 (Notes & AI)
-*   **状态**: 默认展开，**默认显示笔记页**。
-*   **Tabs**:
-    *   `[Notes]` (默认).
-    *   `[AI Chat]`.
-    *   `[...]` (预留给未来的 `References` 或 `Links` 面板).
+
+- **状态**: 默认展开，**默认显示笔记页**。
+- **Tabs**:[Notes] (默认激活): 模拟沉浸式笔记体验。[AI Chat]: 需要对话时切换。[...] (预留槽位).
 
 ---
 
@@ -209,3 +197,19 @@
 3. 研读工作台页：不需要back按钮，有路径和logo两种返回方式足够了，字号分栏等功能应该放在文章顶部的三个点内。
 4. 熔炼页如果不知道还有什么功能，留拓展按钮。
 5. 主题色为浅蓝。
+
+
+
+
+
+
+
+
+
+![image-20260102185556567](/Users/taless/Library/Application Support/typora-user-images/image-20260102185556567.png)
+
+![image-20260102191831318](/Users/taless/Library/Application Support/typora-user-images/image-20260102191831318.png)
+
+![image-20260102192141579](/Users/taless/Library/Application Support/typora-user-images/image-20260102192141579.png)
+
+![image-20260102192220011](/Users/taless/Library/Application Support/typora-user-images/image-20260102192220011.png)
