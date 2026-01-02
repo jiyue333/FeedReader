@@ -2,4 +2,4 @@
 trigger: always_on
 ---
 
-conda enviroment: ankiflow
+project conda enviroment: ankiflow

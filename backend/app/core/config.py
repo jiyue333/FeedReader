@@ -82,8 +82,33 @@ class Settings(BaseSettings):
     # OpenAI
     openai_api_key: str = Field(default="", description="OpenAI API key")
 
+    # File Upload
+    upload_dir: str = Field(
+        default="backend/data/uploads", description="Directory for uploaded files"
+    )
+    max_upload_mb: int = Field(default=50, description="Maximum file upload size in MB")
+
+    # Document Chunking
+    chunk_size: int = Field(
+        default=512, description="Chunk size in tokens for embedding"
+    )
+    chunk_overlap: int = Field(
+        default=50, description="Overlap between chunks in tokens"
+    )
+
     # Search API
     serper_api_key: str = Field(default="", description="Serper API key for web search")
+
+    # RSSHub
+    rsshub_enabled: bool = Field(
+        default=True, description="Enable RSSHub for URL to RSS conversion"
+    )
+    rsshub_base_url: str = Field(
+        default="https://rsshub.app", description="RSSHub instance base URL"
+    )
+    rsshub_timeout: float = Field(
+        default=10.0, description="RSSHub request timeout in seconds"
+    )
 
     # Logging
     log_level: str = Field(default="INFO", description="Logging level")
