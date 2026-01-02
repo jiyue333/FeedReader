@@ -198,14 +198,6 @@
 4. 熔炼页如果不知道还有什么功能，留拓展按钮。
 5. 主题色为浅蓝。
 
-
-
-
-
-
-
-
-
 ![image-20260102185556567](/Users/taless/Library/Application Support/typora-user-images/image-20260102185556567.png)
 
 ![image-20260102191831318](/Users/taless/Library/Application Support/typora-user-images/image-20260102191831318.png)
