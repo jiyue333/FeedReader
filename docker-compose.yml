@@ -1,0 +1,25 @@
+version: "3.9"
+
+services:
+  # PostgreSQL with pgvector extension
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: ankiflow-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-ankiflow}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-ankiflow_dev}
+      POSTGRES_DB: ${POSTGRES_DB:-ankiflow}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-ankiflow} -d ${POSTGRES_DB:-ankiflow}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
+    driver: local

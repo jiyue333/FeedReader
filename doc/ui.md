@@ -54,8 +54,12 @@
     *   **Content**: Favicon, Title (白亮), Smart Tags (灰), Date.
     *   **Hover Action**: 鼠标悬停行时，右侧显示 `[Pin to Staging]` 图标。
 
-### 2.4 右侧栏 (Intelligence)
-*   **状态**: **默认隐藏**。
+### 2.4 右侧栏 (Intelligence - Global Copilot)
+
+- **状态**: **默认隐藏 (Collapsed)**。
+- **交互**: 点击顶部导航栏的 “AI 图标” 或快捷键 (Cmd+B) 唤出。
+- **功能定位**: 针对 **“全局知识库”** 或 **“当前筛选列表”** 的智能助手（而非单篇文章）。
+- **Layout Structure**:**Header**:**Tabs**: [Chat] (默认) | [Insights] (趋势 / 总结) | [...] (预留扩展).**Scope Selector**: 下拉选择 Global Library | Current View | Web Search。**Content Area**:**Empty State**: 显示快捷指令 Chips，如 “Summarize these unread articles”。**Stream**: 传统的 Chat UI。AI 回复中的引用卡片支持**直接拖拽或点击 Pin 到左侧暂存区**。**Input Area**: 输入框 + [Send]。
 
 ---
 

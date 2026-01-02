@@ -1,0 +1,245 @@
+@import "tailwindcss";
+
+/* ======================
+   AnkiFlow Design Tokens
+   ====================== */
+:root {
+  /* Colors - Deep Dark Mode */
+  --color-bg-primary: #121212;
+  --color-bg-secondary: #1e1e1e;
+  --color-bg-tertiary: #2a2a2a;
+  --color-bg-elevated: #333333;
+  
+  /* Text colors */
+  --color-text-primary: #f5f5f5;
+  --color-text-secondary: #a0a0a0;
+  --color-text-muted: #666666;
+  
+  /* Accent colors */
+  --color-primary: #38bdf8;        /* Sky Blue - Primary/Action */
+  --color-primary-hover: #0ea5e9;
+  --color-primary-muted: #38bdf8aa;
+  --color-secondary: #64748b;      /* Slate Blue - Secondary */
+  --color-secondary-hover: #475569;
+  
+  /* Status colors */
+  --color-success: #22c55e;
+  --color-warning: #f59e0b;
+  --color-error: #ef4444;
+  
+  /* Border colors */
+  --color-border: #333333;
+  --color-border-hover: #444444;
+  
+  /* Layout dimensions */
+  --sidebar-width: 280px;
+  --topbar-height: 56px;
+  --ai-panel-width: 360px;
+  
+  /* Transitions */
+  --transition-fast: 150ms ease;
+  --transition-normal: 250ms ease;
+  --transition-slow: 350ms ease;
+  
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.5);
+  
+  /* Fonts */
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-reading: 'Merriweather', Georgia, serif;
+  --font-mono: 'JetBrains Mono', Consolas, monospace;
+}
+
+/* Theme inline for Tailwind v4 */
+@theme inline {
+  --color-background: var(--color-bg-primary);
+  --color-foreground: var(--color-text-primary);
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+  
+  /* Custom colors for Tailwind */
+  --color-primary: var(--color-primary);
+  --color-secondary: var(--color-secondary);
+  --color-surface: var(--color-bg-secondary);
+  --color-surface-elevated: var(--color-bg-elevated);
+  --color-muted: var(--color-text-muted);
+}
+
+/* ======================
+   Global Styles
+   ====================== */
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.5;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ======================
+   Scrollbar Styling
+   ====================== */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-bg-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-bg-elevated);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-border-hover);
+}
+
+/* ======================
+   Selection
+   ====================== */
+::selection {
+  background: var(--color-primary-muted);
+  color: var(--color-text-primary);
+}
+
+/* ======================
+   Focus States
+   ====================== */
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* ======================
+   Link Styles
+   ====================== */
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+a:hover {
+  color: var(--color-primary-hover);
+}
+
+/* ======================
+   Button Base
+   ====================== */
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+}
+
+/* ======================
+   Input Base
+   ====================== */
+input, textarea, select {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  padding: 8px 12px;
+  transition: border-color var(--transition-fast);
+}
+
+input:focus, textarea:focus, select:focus {
+  border-color: var(--color-primary);
+}
+
+/* ======================
+   Animation Keyframes
+   ====================== */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideInFromRight {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes slideInFromLeft {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+@keyframes highlightFlash {
+  0% { background-color: var(--color-primary-muted); }
+  100% { background-color: transparent; }
+}
+
+/* ======================
+   Utility Classes
+   ====================== */
+.animate-fadeIn {
+  animation: fadeIn var(--transition-normal) forwards;
+}
+
+.animate-slideInRight {
+  animation: slideInFromRight var(--transition-normal) forwards;
+}
+
+.animate-slideInLeft {
+  animation: slideInFromLeft var(--transition-normal) forwards;
+}
+
+.animate-pulse {
+  animation: pulse 2s infinite;
+}
+
+.highlight-flash {
+  animation: highlightFlash 1s ease-out;
+}
+
+/* ======================
+   Layout Utilities
+   ====================== */
+.scrollable {
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.truncate-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.truncate-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
