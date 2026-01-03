@@ -1,52 +1,134 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import EmptyStateChips from "./EmptyStateChips";
 import CitationCard, { Citation } from "./CitationCard";
 import ChatInput from "./ChatInput";
 
 interface ChatTabProps {
     onPinCitation: (citation: Citation) => void;
+    scope: "global" | "current_view" | "web";
+    includeWeb: boolean;
+}
+
+interface Message {
+    role: "user" | "assistant";
+    content: string;
+    citations?: Citation[];
 }
 
 /**
  * Chat tab content with empty state, chat stream, and input
  */
-export default function ChatTab({ onPinCitation }: ChatTabProps) {
-    const [messages, setMessages] = useState<
-        Array<{ role: "user" | "assistant"; content: string; citations?: Citation[] }>
-    >([]);
+export default function ChatTab({ onPinCitation, scope, includeWeb }: ChatTabProps) {
+    const [messages, setMessages] = useState<Message[]>([]);
+    const [isStreaming, setIsStreaming] = useState(false);
+    const abortControllerRef = useRef<AbortController | null>(null);
 
-    const handleSendMessage = (message: string) => {
+    useEffect(() => {
+        // Cleanup on unmount
+        return () => {
+            abortControllerRef.current?.abort();
+        };
+    }, []);
+
+    const handleSendMessage = async (message: string) => {
+        // Cancel previous request if any
+        abortControllerRef.current?.abort();
+        abortControllerRef.current = new AbortController();
+
         // Add user message
-        const userMessage = { role: "user" as const, content: message };
+        const userMessage: Message = { role: "user", content: message };
         setMessages((prev) => [...prev, userMessage]);
 
-        // Simulate AI response with citations (mock)
-        setTimeout(() => {
-            const mockCitations: Citation[] = [
-                {
-                    id: `citation-${Date.now()}-1`,
-                    title: "Understanding RAG Architecture",
-                    source: "AI Weekly",
-                    snippet: "Retrieval-Augmented Generation combines the power of large language models with external knowledge retrieval...",
-                },
-                {
-                    id: `citation-${Date.now()}-2`,
-                    title: "Vector Databases for AI",
-                    source: "Tech Insights",
-                    snippet: "Modern AI applications rely on efficient similarity search powered by vector embeddings...",
-                },
-            ];
+        // Start streaming AI response
+        setIsStreaming(true);
 
-            const aiMessage = {
-                role: "assistant" as const,
-                content: "Based on your knowledge base, I found several relevant articles about this topic. The key insights are: RAG systems enhance LLM responses by retrieving relevant context, and vector databases enable efficient semantic search.",
-                citations: mockCitations,
+        try {
+            const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8000";
+            const response = await fetch(`${API_BASE}/api/chat/stream`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    message,
+                    scope,
+                    include_web: includeWeb,
+                }),
+                signal: abortControllerRef.current.signal,
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const reader = response.body?.getReader();
+            const decoder = new TextDecoder();
+
+            if (!reader) {
+                throw new Error("No response body");
+            }
+
+            let assistantMessage: Message = { role: "assistant", content: "", citations: [] };
+            let buffer = "";
+
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+
+                buffer += decoder.decode(value, { stream: true });
+                const lines = buffer.split("\n");
+                buffer = lines.pop() || "";
+
+                for (const line of lines) {
+                    if (line.startsWith("data: ")) {
+                        const data = line.slice(6);
+                        try {
+                            const event = JSON.parse(data);
+
+                            if (event.type === "text") {
+                                assistantMessage.content += event.content;
+                                setMessages((prev) => {
+                                    const newMessages = [...prev];
+                                    if (newMessages[newMessages.length - 1]?.role === "assistant") {
+                                        newMessages[newMessages.length - 1] = { ...assistantMessage };
+                                    } else {
+                                        newMessages.push({ ...assistantMessage });
+                                    }
+                                    return newMessages;
+                                });
+                            } else if (event.type === "citation") {
+                                assistantMessage.citations = assistantMessage.citations || [];
+                                assistantMessage.citations.push(event.citation);
+                            } else if (event.type === "error") {
+                                console.error("Stream error:", event.error);
+                            }
+                        } catch (e) {
+                            console.error("Failed to parse SSE event:", e);
+                        }
+                    }
+                }
+            }
+
+            // Final update with citations
+            setMessages((prev) => {
+                const newMessages = [...prev];
+                if (newMessages[newMessages.length - 1]?.role === "assistant") {
+                    newMessages[newMessages.length - 1] = { ...assistantMessage };
+                }
+                return newMessages;
+            });
+        } catch (error) {
+            console.error("Chat error:", error);
+            const errorMessage: Message = {
+                role: "assistant",
+                content: "Sorry, I encountered an error. Please try again.",
             };
-
-            setMessages((prev) => [...prev, aiMessage]);
-        }, 1000);
+            setMessages((prev) => [...prev, errorMessage]);
+        } finally {
+            setIsStreaming(false);
+        }
     };
 
     const handleChipClick = (command: string) => {

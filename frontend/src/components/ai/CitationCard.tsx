@@ -3,8 +3,12 @@
 export interface Citation {
     id: string;
     title: string;
-    source: string;
-    snippet?: string;
+    source_type: "local" | "web";
+    document_id?: string;
+    chunk_id?: string;
+    url?: string;
+    snippet: string;
+    score?: number;
 }
 
 interface CitationCardProps {
@@ -22,7 +26,9 @@ export default function CitationCard({ citation, onPin }: CitationCardProps) {
         const data = JSON.stringify({
             id: citation.id,
             title: citation.title,
-            source: citation.source,
+            source_type: citation.source_type,
+            document_id: citation.document_id,
+            url: citation.url,
         });
         // Set both types for cross-browser compatibility
         e.dataTransfer.setData("application/json", data);
@@ -58,20 +64,31 @@ export default function CitationCard({ citation, onPin }: CitationCardProps) {
                             {citation.title}
                         </p>
                     </div>
-                    <p
-                        className="text-xs line-clamp-1"
-                        style={{ color: "var(--color-text-muted)" }}
-                    >
-                        {citation.source}
-                    </p>
-                    {citation.snippet && (
-                        <p
-                            className="text-xs line-clamp-2"
-                            style={{ color: "var(--color-text-secondary)" }}
+                    <div className="flex items-center gap-2">
+                        <span
+                            className="inline-flex items-center rounded px-1.5 py-0.5 text-xs font-medium"
+                            style={{
+                                backgroundColor: citation.source_type === "local" ? "var(--color-primary)" : "var(--color-secondary)",
+                                color: "#000",
+                            }}
                         >
-                            {citation.snippet}
-                        </p>
-                    )}
+                            [{citation.source_type.toUpperCase()}]
+                        </span>
+                        {citation.url && (
+                            <p
+                                className="text-xs line-clamp-1"
+                                style={{ color: "var(--color-text-muted)" }}
+                            >
+                                {citation.url}
+                            </p>
+                        )}
+                    </div>
+                    <p
+                        className="text-xs line-clamp-2"
+                        style={{ color: "var(--color-text-secondary)" }}
+                    >
+                        {citation.snippet}
+                    </p>
                 </div>
                 <button
                     onClick={() => onPin(citation)}

@@ -29,7 +29,7 @@ export default function AIPanel({ onClose, onPinToStaging }: AIPanelProps) {
     onPinToStaging({
       id: citation.id,
       title: citation.title,
-      source: citation.source,
+      source: citation.source_type,
     });
   };
 
@@ -92,7 +92,13 @@ export default function AIPanel({ onClose, onPinToStaging }: AIPanelProps) {
 
       {/* Tab Content */}
       <div className="flex-1 overflow-hidden">
-        {activeTab === "chat" && <ChatTab onPinCitation={handlePinCitation} />}
+        {activeTab === "chat" && (
+          <ChatTab
+            onPinCitation={handlePinCitation}
+            scope={scope === "current" ? "current_view" : scope}
+            includeWeb={scope === "web"}
+          />
+        )}
         {activeTab === "insights" && <InsightsTab />}
         {activeTab === "more" && (
           <div className="flex h-full items-center justify-center p-8 text-center">
